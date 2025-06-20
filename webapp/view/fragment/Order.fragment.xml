@@ -1,0 +1,89 @@
+<core:FragmentDefinition
+    xmlns="sap.ui.comp.valuehelpdialog"
+    xmlns:m="sap.m"
+    xmlns:fb="sap.ui.comp.filterbar"
+    xmlns:core="sap.ui.core"
+>
+    <ValueHelpDialog
+        id="orderVHDialog"
+        title="Order Number"
+        ok=".onVHOkPress"
+        cancel=".onVHCancelPress"
+        afterClose=".onVHAfterClose"
+        supportRanges="false"
+       
+        key="Order"
+        descriptionKey="Material"
+    >
+        <filterBar>
+            <fb:FilterBar
+                id="orderVHFilterBar"
+                advancedMode="true"
+                search=".onVHSearch"
+                isRunningInValueHelpDialog="true"
+            >
+                <fb:filterGroupItems>
+                    <fb:FilterGroupItem
+                        id="orderVH_MaterialItem"
+                        groupName="__$INTERNAL$"
+                        name="Product"
+                        label="Material"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                            <m:Input
+                                id="matInput"
+                                name="Product"
+                            />
+                        </fb:control>
+                    </fb:FilterGroupItem>
+                    <fb:FilterGroupItem
+                        id="orderVH_GroupItem"
+                        groupName="__$INTERNAL$"
+                        name="BillOfOperationsGroup"
+                        label="Group"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                            <m:Input
+                                id="groupInput"
+                                name="BillOfOperationsGroup"
+                            />
+                        </fb:control>
+                    </fb:FilterGroupItem>
+                    <fb:FilterGroupItem
+                        id="orderVH_GroupCounterItem"
+                        groupName="__$INTERNAL$"
+                        name="BillOfOperationsVariant"
+                        label="Group Counter"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                            <m:Input
+                                id="groupCounterInput"
+                                name="BillOfOperationsVariant"
+                            />
+                        </fb:control>
+                    </fb:FilterGroupItem>
+                    <fb:FilterGroupItem
+                        id="orderVH_OrderItem"
+                        groupName="__$INTERNAL$"
+                        name="ManufacturingOrder"
+                        label="Order"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                            <m:Input
+                                id="orderInput"
+                                name="ManufacturingOrder"
+                            />
+                        </fb:control>
+                   
+                           
+                    </fb:FilterGroupItem>
+                </fb:filterGroupItems>
+            </fb:FilterBar>
+        </filterBar>
+        
+    </ValueHelpDialog>
+</core:FragmentDefinition>

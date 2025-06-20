@@ -1,0 +1,357 @@
+<mvc:View
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:m="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:t="sap.ui.table"
+    xmlns:f="sap.ui.layout.form"
+    controllerName="zproductionorder.controller.View1"
+    height="100%"
+>
+    <m:Page
+        id="_IDGenPage1"
+        title="Enter Time Ticket for Production Order"
+    >
+        <m:customHeader>
+            <m:Toolbar id="_IDGenToolbar">
+                <m:ToolbarSpacer id="_IDGenToolbarSpacer" />
+            </m:Toolbar>
+        </m:customHeader>
+
+        <m:Panel
+            id="_IDGenPanel"
+            expandable="false"
+            expanded="true"
+            headerText="Enter Time Ticket for Production Order"
+            width="auto"
+            class="sapUiResponsiveMargin compactFormSpacing"
+        >
+            <m:content>
+                <f:SimpleForm
+                    id="_IDGenSimpleForm"
+                    layout="ResponsiveGridLayout"
+                    labelSpanXL="4"
+                    labelSpanL="4"
+                    labelSpanM="6"
+                    labelSpanS="12"
+                    adjustLabelSpan="false"
+                    emptySpanXL="0"
+                    emptySpanL="0"
+                    emptySpanM="0"
+                    emptySpanS="0"
+                    columnsXL="3"
+                    columnsL="3"
+                    columnsM="2"
+                    singleContainerFullSize="false"
+                    editable="true"
+                >
+                    <f:content>
+                        <!-- Left Column -->
+                        
+
+                        <m:Label
+                            id="_IDGenLabel2"
+                            text="Order"
+                        />
+                        <m:Input
+                            id="_IDGenInput1"
+                            width="200px"
+                            value="{formModel>/ManufacturingOrder}"
+                            showValueHelp="true"
+                            valueHelpRequest=".onProductionOrder"
+                            change="onChange"
+                        />
+
+                        <m:Label
+                            id="_IDGenLabel3"
+                            text="Operation"
+                        />
+                        <m:Input
+                            id="_IDGenInput2"
+                            width="200px"
+                            value="{formModel>/Operation}"
+                            editable="false"
+                            liveChange="onLiveChange"
+                        />
+
+                      
+
+                        <m:Label
+                            id="_IDGenLabel5"
+                            text="Plant"
+                        />
+                        <m:Input
+                            id="_IDGenInput4"
+                            width="200px"
+                             value="{formModel>/Plant}"
+                            editable="false"
+                           
+                            liveChange="onLiveChange"
+                        />
+
+                         <m:Label id="_IDGenLabel36"
+                text="Shift"
+                class="leftPadding"
+            />
+            <m:ComboBox id="_IDGenComboBox2"
+                            
+                            width="200px"
+                            selectedKey="{HEADER>/Shift}"
+                        >
+                            <m:items>
+                                <core:Item id="_IDGenItem3"
+                                    
+                                    key="1"
+                                    text="1 Day"
+                                />
+                                <core:Item id="_IDGenItem4"
+                                    
+                                    key="2"
+                                    text="2 Night"
+                                />
+                            </m:items>
+                        </m:ComboBox>
+
+                        
+
+                           <m:Label 
+                        id = "_IDGenLabe9"
+                        text="PostingDate"
+
+                        />
+<m:DatePicker
+    id="_IDGenDatePicker10"
+    width="200px"
+    displayFormat="dd.MM.yyyy"
+    valueFormat="yyyy-MM-dd"
+/>
+                         <m:Label
+                            id="_IDGenLabel12"
+                            text="Yield"
+                        />
+                        <m:Input
+                            id="_IDGenInput11"
+                            width="200px"
+                            liveChange="onLiveChange"
+                        />
+
+                         <m:Label
+                            id="_IDGenLabel14"
+                            text="Rework"
+                        />
+                        <m:Input
+                            id="_IDGenInput13"
+                            width="200px"
+                            liveChange="onLiveChange"
+                        />
+
+
+
+                        <m:Label
+                            id="_IDGenLabel6"
+                            text="Saleable Waste"
+                        />
+                        <m:Input
+                            id="_IDGenInput5"
+                            width="200px"
+                            liveChange="onLiveChange"
+                        />
+
+                        <m:Label 
+                        id = "_IDGenLabe7"
+                        text="RB Consumed"
+
+                        />
+                         <m:Input
+                            id="_IDGenInput6"
+                            width="200px"
+                            liveChange="onLiveChange"
+                        />
+                       
+
+                        <core:Title
+                            id="_IDGenTitle"
+                            text=""
+                        />
+
+                        <!-- Right Column -->
+
+
+                       
+
+                       
+
+                      
+                      
+                    </f:content>
+                </f:SimpleForm>
+               
+  <m:HBox id="_IDGenHBox" 
+  alignItems="Center"
+   justifyContent="End"
+    class="sapUiSmallMarginTop">
+                    <m:Button id="_IDGenButtonGenerate" 
+                    text="Generate" 
+                    type="Emphasized" 
+                    press="onGenerate"
+                     width="150px" />
+                </m:HBox>
+
+            </m:content>
+        </m:Panel>
+
+       
+       
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <m:Panel
+            id="_IDGenPanel4"
+            headerText="Goods Movements Overview ____________________________________________________________________"
+            class="sapUiResponsiveMargin"
+            width="auto"
+            expandable="false"
+            expanded="true"
+        >
+            <m:content>
+                <t:Table
+                    id="goodsMovementTable"
+                    rows="{formModel>/_GoodsMovements}"
+                    selectionMode="MultiToggle"
+                    visibleRowCount="5"
+                    width="100%"
+                >
+                    <t:columns>
+                        <t:Column id="_IDGenColumn">
+                            <t:label>
+                                <m:Label
+                                    id="_IDGenLabel27"
+                                    text="Material"
+                                />
+                            </t:label>
+                            <t:template>
+                                <m:Text
+                                    id="_IDGenText1"
+                                    text="{formModel>Material}"
+                                />
+                            </t:template>
+                        </t:Column>
+
+                        <t:Column id="_IDGenColumn1">
+                            <t:label>
+                                <m:Label
+                                    id="_IDGenLabel28"
+                                    text="Quantity"
+                                />
+                            </t:label>
+                            <t:template>
+                                <m:Input
+                                    id="_IDGenInput29"
+                                    value="{formModel>Quantity}"
+                                    width="100%"
+                                />
+                            </t:template>
+                        </t:Column>
+
+                        <t:Column id="_IDGenColumn2">
+                            <t:label>
+                                <m:Label
+                                    id="_IDGenLabel29"
+                                    text="Unit of Entry"
+                                />
+                            </t:label>
+                            <t:template>
+                                <m:Text
+                                    id="_IDGenText2"
+                                    text="{formModel>Unit}"
+                                />
+                            </t:template>
+                        </t:Column>
+
+
+                        <t:Column id="_IDGenColumn4">
+                            <t:label>
+                                <m:Label
+                                    id="_IDGenLabel31"
+                                    text="Location"
+                                />
+                            </t:label>
+                            <t:template>
+                                <m:Text
+                                    id="_IDGenText4"
+                                    text="{formModel>StorageLocation}"
+                                />
+                            </t:template>
+                        </t:Column>
+
+                        <t:Column id="_IDGenColumn5">
+                            <t:label>
+                                <m:Label
+                                    id="_IDGenLabel32"
+                                    text="Batch"
+                                />
+                            </t:label>
+                            <t:template>
+                                <m:Text
+                                    id="_IDGenText5"
+                                    text="{formModel>Batch}"
+                                />
+                            </t:template>
+                        </t:Column>
+
+                        <t:Column id="_IDGenColumn8">
+                            <t:label>
+                                <m:Label
+                                    id="_IDGenLabel35"
+                                    text="Movement Type"
+                                />
+                            </t:label>
+                            <t:template>
+                                <m:Text
+                                    id="_IDGenText8"
+                                    text="{formModel>GoodsMovementType}"
+                                />
+                            </t:template>
+                        </t:Column>
+                    </t:columns>
+                </t:Table>
+            </m:content>
+        </m:Panel>
+
+        <m:footer>
+            <m:OverflowToolbar id="_IDGenOverflowToolbar">
+                <m:ToolbarSpacer id="_IDGenToolbarSpacer1" />
+                <m:Button
+                    id="_IDGenButton"
+                    type="Emphasized"
+                    text="Post"
+                    press="onClickPost"
+                />
+               
+                <m:Button
+                    id="_IDGenButton2"
+                    type="Default"
+                    text="Cancel"
+                    press="cancel"
+                />
+            </m:OverflowToolbar>
+        </m:footer>
+    </m:Page>
+</mvc:View>

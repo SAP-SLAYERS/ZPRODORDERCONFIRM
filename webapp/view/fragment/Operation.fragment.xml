@@ -1,0 +1,192 @@
+<core:FragmentDefinition
+    xmlns="sap.ui.comp.valuehelpdialog"
+    xmlns:m="sap.m"
+    xmlns:fb="sap.ui.comp.filterbar"
+    xmlns:core="sap.ui.core"
+>
+    <ValueHelpDialog
+        id="operationVHdialog"
+        title="Activity"
+        ok=".onOPOkPress"
+        cancel=".onOPCancelPress"
+        afterClose=".onOPAfterClose"
+        supportRanges="false"
+        key="Operation"
+        descriptionKey="Activity"
+    >
+        <filterBar>
+            <fb:FilterBar
+                id="operationVHFilterBar"
+                advancedMode="true"
+                search=".onOPSearch"
+                isRunningInValueHelpDialog="true"
+            >
+                <fb:filterGroupItems>
+                    <fb:FilterGroupItem
+                        id="oerationVH_ActivityItem"
+                        groupName="__$INTERNAL$"
+                        name="Activity"
+                        label="Activity"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                            <m:Input id="_IDGenInput30"
+                                name="Activity"
+                            />
+                        </fb:control>
+                    </fb:FilterGroupItem>
+                    <fb:FilterGroupItem
+                        id="operationVH_SequenceItem"
+                        groupName="__$INTERNAL$"
+                        name="Sequence"
+                        label="Sequence"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                            <m:Input
+                                id="seqInput"
+                                name="Sequence"
+                            />
+                        </fb:control>
+                    </fb:FilterGroupItem>
+                    <fb:FilterGroupItem
+                        id="operationVH_OperationQtyItem"
+                        groupName="__$INTERNAL$"
+                        name="Operation Quantity"
+                        label="Operation Quantity"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                            <m:Input
+                                id="OPqtyInput"
+                                name="Operation Quantity"
+                            />
+                        </fb:control>
+                    </fb:FilterGroupItem>
+                    <fb:FilterGroupItem
+                        id="orderVH_OperationUnit"
+                        groupName="__$INTERNAL$"
+                        name="Operation Unit"
+                        label="Operation Unit"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                            <m:Input
+                                id="OpUnitInput"
+                                name="Operation Unit"
+                            />
+                        </fb:control>
+                   
+                           
+                    </fb:FilterGroupItem>
+
+                    <fb:FilterGroupItem
+                        id="operationVH_OperationShorttxtItem"
+                        groupName="__$INTERNAL$"
+                        name="Operation Short Text"
+                        label="Operation Short Text"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                            <m:Input
+                                id="OPShortTextInput"
+                                name="Operation Short Text"
+                            />
+                        </fb:control>
+                    </fb:FilterGroupItem>
+
+                    <fb:FilterGroupItem
+                        id="operationVH_yieldItem"
+                        groupName="__$INTERNAL$"
+                        name="Confirmed Yield"
+                        label="Confirmed Yield"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                            <m:Input
+                                id="OPyieldInput"
+                                name="Confirmed Yield"
+                            />
+                        </fb:control>
+                    </fb:FilterGroupItem>
+
+                    <fb:FilterGroupItem
+                        id="operationVH_OperationScarpItem"
+                        groupName="__$INTERNAL$"
+                        name="Confirmed Scrap"
+                        label="Confirmed Scrap"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                            <m:Input
+                                id="OPScrapInput"
+                                name="Confirmed Scrap"
+                            />
+                        </fb:control>
+                    </fb:FilterGroupItem>
+
+                    <fb:FilterGroupItem
+                        id="operationVH_OperationReworkItem"
+                        groupName="__$INTERNAL$"
+                        name="Confirmed Rework"
+                        label="Confirmed Rework"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                            <m:Input
+                                id="OPReworkInput"
+                                name="Confirmed Rework"
+                            />
+                        </fb:control>
+                    </fb:FilterGroupItem>
+
+                    <fb:FilterGroupItem
+                        id="operationVH_OperationWorkCenterItem"
+                        groupName="__$INTERNAL$"
+                        name="Work Center"
+                        label="Work Center "
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                            <m:Input
+                                id="OPWCInput"
+                                name="Work Center"
+                            />
+                        </fb:control>
+                    </fb:FilterGroupItem>
+
+                    <fb:FilterGroupItem
+                        id="operationVH_OperationPlantItem"
+                        groupName="__$INTERNAL$"
+                        name="Plant"
+                        label="Plant"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                            <m:Input
+                                id="OPpltInput"
+                                name="Plant"
+                            />
+                        </fb:control>
+                    </fb:FilterGroupItem>
+
+                      <fb:FilterGroupItem
+                        id="operationVH_OperationMileIndItem"
+                        groupName="__$INTERNAL$"
+                        name="Milestone Indicator"
+                        label="Milestone Indicator"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                            <m:Input
+                                id="OPMileIndInput"
+                                name="Milestone Indicator"
+                            />
+                        </fb:control>
+                    </fb:FilterGroupItem>
+                </fb:filterGroupItems>
+            </fb:FilterBar>
+        </filterBar>
+        
+    </ValueHelpDialog>
+</core:FragmentDefinition>

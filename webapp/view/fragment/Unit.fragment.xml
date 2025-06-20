@@ -1,0 +1,74 @@
+<core:FragmentDefinition
+    xmlns="sap.ui.comp.valuehelpdialog"
+    xmlns:m="sap.m"
+    xmlns:fb="sap.ui.comp.filterbar"
+    xmlns:core="sap.ui.core"
+>
+    <ValueHelpDialog
+        id="unitVHDialog"
+        title="Confirmation Unit of Measure"
+        ok=".onUnitVHOkPress"
+        cancel=".onUnitVHCancelPress"
+        afterClose=".onUnitVHAfterClose"
+        supportRanges="false"
+        key="UnitOfMeasure"
+        descriptionKey="UnitOfMeasureText"
+    >
+        <filterBar>
+            <fb:FilterBar
+                id="unitVHFilterBar"
+                advancedMode="true"
+                search=".onUnitVHSearch"
+                isRunningInValueHelpDialog="true"
+            >
+                <fb:filterGroupItems>
+                    <fb:FilterGroupItem id="_IDGenFilterGroupItem1"
+                        groupName="__$INTERNAL$"
+                        name="Commercial"
+                        label="Commercial"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                            <m:Input id="_IDGenInput31"  name="Commercial" />
+                        </fb:control>
+                    </fb:FilterGroupItem>
+
+                    <fb:FilterGroupItem id="_IDGenFilterGroupItem2"
+                        groupName="__$INTERNAL$"
+                        name="InternalUoM"
+                        label="Internal UoM"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                            <m:Input id="_IDGenInput32"  name="InternalUoM" />
+                        </fb:control>
+                    </fb:FilterGroupItem>
+
+                    <fb:FilterGroupItem id="_IDGenFilterGroupItem3"
+                        groupName="__$INTERNAL$"
+                        name="UnitText"
+                        label="Meas. Unit Text"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                            <m:Input id="_IDGenInput33" name="UnitText" />
+                        </fb:control>
+                    </fb:FilterGroupItem>
+
+                    <fb:FilterGroupItem id="_IDGenFilterGroupItem4"
+                        groupName="__$INTERNAL$"
+                        name="DimensionText"
+                        label="Dimension Text"
+                        visibleInFilterBar="true"
+                    >
+                        <fb:control>
+                            <m:Input id="_IDGenInput34"  name="DimensionText" />
+                        </fb:control>
+                    </fb:FilterGroupItem>
+                </fb:filterGroupItems>
+            </fb:FilterBar>
+        </filterBar>
+       
+        
+    </ValueHelpDialog>
+</core:FragmentDefinition>
