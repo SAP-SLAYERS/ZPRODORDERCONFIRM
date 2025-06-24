@@ -14,6 +14,7 @@ import Token from "sap/m/Token";
 import BusyIndicator from "sap/ui/core/BusyIndicator";
 import MessageToast from "sap/m/MessageToast";
 import JSONModel from "sap/ui/model/json/JSONModel";
+import DateFormat from "sap/ui/core/format/DateFormat";
 
 export default class View1 extends Controller {
     private _oBasicSearchField: SearchField | null = null;
@@ -31,8 +32,8 @@ export default class View1 extends Controller {
         WorkCenter: "",
         WorkCenterDescription: "",
         Confirmation: "",
-        
-      });
+
+    });
 
 
     public onInit(): void {
@@ -604,24 +605,65 @@ export default class View1 extends Controller {
 
 
 
+    public onQtyChange() {
+        let Yield = Number(this.formModel.getProperty("/YieldQuantity") ),
+            Rework = Number(this.formModel.getProperty("/ReworkQuantity") );
+        let lines = [...this.formModel.getProperty("/_GoodsMovements")];
+        for (let index = 0; index < lines.length; index++) {
+            const element = lines[index];
+            if (element.GoodsMovementType === '101') {
+                lines[index].Quantity = (Yield + Rework);
+            }
+            else if (element.GoodsMovementType === '261' && element.MaterialType !== 'ZCOP') {
+                lines[index].Quantity = Number(Number(element.Multiplier) * (Yield + Rework)).toFixed(3)
+            }
+            else if (element.GoodsMovementType === '531' && element.MaterialType === 'ZCOP') {
+                lines[index].Quantity = Number(Rework).toFixed(3)
+            }
+        }
+        this.formModel.setProperty("/_GoodsMovements", lines);
+    }
+
+    public saleableQtyChange(oEvent:any){
+        const qty = oEvent.getParameter("value");
+        let lines = [...this.formModel.getProperty("/_GoodsMovements")];
+        for (let index = 0; index < lines.length; index++) {
+            const element = lines[index];
+            if (element.GoodsMovementType === '531' && element.MaterialType === 'ZNVM') {
+                lines[index].Quantity = Number(qty).toFixed(3)
+            }
+        }
+        this.formModel.setProperty("/_GoodsMovements", lines);
+    }
+
+    public RBQtyChange(oEvent:any){
+        const qty = oEvent.getParameter("value");
+        let lines = [...this.formModel.getProperty("/_GoodsMovements")];
+        for (let index = 0; index < lines.length; index++) {
+            const element = lines[index];
+            if (element.GoodsMovementType === '261' && element.MaterialType === 'ZCOP') {
+                lines[index].Quantity = Number(qty).toFixed(3)
+            }
+        }
+        this.formModel.setProperty("/_GoodsMovements", lines);
+    }
 
 
 
+    public onGenerate() {
 
-    public onChange(oEvent: any) {
-        
-        const sValue = oEvent.getParameter("value");
+        const sValue = this.formModel.getProperty("/ManufacturingOrder");
         const that = this;
-    
+
         if (!sValue) {
             MessageToast.show("Please enter a Manufacturing Order");
             return;
         }
-    
+
         BusyIndicator.show();
-    
+
         $.ajax({
-            url: "/sap/bc/http/sap/ZPRODUCTION_ORDER_HTTP",
+            url: "/sap/bc/http/sap/ZHTTP_GENERATEPRODDATA",
             method: "GET",
             headers: {
                 "Order": sValue
@@ -629,13 +671,46 @@ export default class View1 extends Controller {
             contentType: "application/json",
             success: function (response) {
                 if (response) {
-                    debugger
                     that.formModel.setData({
                         ...that.formModel.getData(),
                         ...response,
                         ManufacturingOrder: sValue
                     });
-    
+
+                    var oNow = new Date();
+
+                    // Format date as "yyyy-MM-ddTHH:mm:ss" (for DatePicker)
+                    var oDateFormatter = DateFormat.getDateInstance({ pattern: "yyyy-MM-ddTHH:mm:ss" });
+                    var sFormattedDate = oDateFormatter.format(oNow);
+                    that.formModel.setProperty("/PostingDate",sFormattedDate)
+            
+
+                    MessageToast.show("Fields auto-filled successfully");
+                } else {
+                    MessageToast.show("No data found for the entered order");
+                }
+                BusyIndicator.hide();
+            },
+            error: function (error) {
+                MessageToast.show("Update failed: " + (error.responseText || "Unknown error"));
+                BusyIndicator.hide();
+            }
+        });
+    }
+
+    public onClickPost() {
+
+        const data = this.formModel.getData();
+
+        $.ajax({
+            url: "/sap/bc/http/sap/ZHTTP_PRODORDERCONFIRM",
+            method: "POST",
+            data: JSON.stringify(data),
+            contentType: "application/json",
+            success: function (response) {
+                if (response) {
+                    debugger
+
                     MessageToast.show("Fields auto-filled successfully");
                 } else {
                     MessageToast.show("No data found for the entered order");
@@ -650,4 +725,4 @@ export default class View1 extends Controller {
     }
 
 
-    }
+}
