@@ -1,0 +1,4 @@
+@EndUserText.label: 'Production Order Confirmation'
+define service ZUI_PRODORDCNFM {
+  expose ZR_PRODUCTIONORDER as ProductionOrder;
+}
