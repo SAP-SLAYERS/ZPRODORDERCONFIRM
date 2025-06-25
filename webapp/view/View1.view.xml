@@ -168,59 +168,111 @@
                             id="_IDGenTitle1"
                             text=""
                         />
-                        <!-- Setup Time -->
+
                         <m:Label
                             id="_IDGenLabel"
-                            text="Setup"
+                            text="{formModel>/_Activities/0/Name}"
                         />
-                        <m:HBox id="_IDGenHBox1">
+                        <m:HBox id="_IDGenHBox">
                             <m:Input
-                                id="_IDGenInput"
-                                width="150px"
-                                value="{formModel>/SetupTime}"
+                                id="_IDGenInput3"
+                                value="{formModel>/_Activities/0/Quantity}"
                                 type="Number"
+                                visible="false"
                             />
                             <m:Text
                                 id="_IDGenText"
-                                text="HR"
+                                text="{formModel>/_Activities/0/Unit}"
                                 class="sapUiSmallMarginBegin sapUiSmallMarginEnd"
                             />
                         </m:HBox>
 
-                        <!-- Machine Time -->
                         <m:Label
                             id="_IDGenLabel1"
-                            text="Machine"
+                            text="{formModel>/_Activities/1/Name}"
                         />
-                        <m:HBox id="_IDGenHBox2">
+                        <m:HBox id="_IDGenHBox1">
                             <m:Input
-                                id="_IDGenInput3"
-                                width="150px"
-                                value="{formModel>/MachineTime}"
+                                id="_IDGenInput7"
+                                value="{formModel>/_Activities/1/Quantity}"
                                 type="Number"
+                                visible="false"
                             />
                             <m:Text
                                 id="_IDGenText3"
-                                text="HR"
+                                text="{formModel>/_Activities/1/Unit}"
                                 class="sapUiSmallMarginBegin sapUiSmallMarginEnd"
                             />
                         </m:HBox>
 
-                        <!-- Labor Time -->
                         <m:Label
                             id="_IDGenLabel4"
-                            text="Labor"
+                            text="{formModel>/_Activities/2/Name}"
                         />
-                        <m:HBox id="_IDGenHBox3">
+                        <m:HBox id="_IDGenHBox2">
                             <m:Input
-                                id="_IDGenInput7"
-                                width="150px"
-                                value="{formModel>/LaborTime}"
+                                id="_IDGenInput8"
+                                value="{formModel>/_Activities/2/Quantity}"
                                 type="Number"
+                                visible="false"
                             />
                             <m:Text
                                 id="_IDGenText6"
-                                text="HR"
+                                text="{formModel>/_Activities/2/Unit}"
+                                class="sapUiSmallMarginBegin sapUiSmallMarginEnd"
+                            />
+                        </m:HBox>
+
+                        <m:Label
+                            id="_IDGenLabel9"
+                            text="{formModel>/_Activities/3/Name}"
+                        />
+                        <m:HBox id="_IDGenHBox3">
+                            <m:Input
+                                id="_IDGenInput10"
+                                value="{formModel>/_Activities/3/Quantity}"
+                                type="Number"
+                                visible="false"
+                            />
+                            <m:Text
+                                id="_IDGenText7"
+                                text="{formModel>/_Activities/3/Unit}"
+                                class="sapUiSmallMarginBegin sapUiSmallMarginEnd"
+                            />
+                        </m:HBox>
+
+                        <m:Label
+                            id="_IDGenLabel10"
+                            text="{formModel>/_Activities/4/Name}"
+                        />
+                        <m:HBox id="_IDGenHBox4">
+                            <m:Input
+                                id="_IDGenInput12"
+                                value="{formModel>/_Activities/4/Quantity}"
+                                type="Number"
+                                visible="false"
+                            />
+                            <m:Text
+                                id="_IDGenText9"
+                                text="{formModel>/_Activities/4/Unit}"
+                                class="sapUiSmallMarginBegin sapUiSmallMarginEnd"
+                            />
+                        </m:HBox>
+
+                        <m:Label
+                            id="_IDGenLabel11"
+                            text="{formModel>/_Activities/5/Name}"
+                        />
+                        <m:HBox id="_IDGenHBox5">
+                            <m:Input
+                                id="_IDGenInput14"
+                                value="{formModel>/_Activities/5/Quantity}"
+                                type="Number"
+                                visible="false"
+                            />
+                            <m:Text
+                                id="_IDGenText10"
+                                text="{formModel>/_Activities/5/Unit}"
                                 class="sapUiSmallMarginBegin sapUiSmallMarginEnd"
                             />
                         </m:HBox>
@@ -274,7 +326,10 @@
                                 />
                             </t:template>
                         </t:Column>
-                        <t:Column id="_IDGenColumn3" width="20rem">
+                        <t:Column
+                            id="_IDGenColumn3"
+                            width="20rem"
+                        >
                             <t:label>
                                 <m:Label
                                     id="_IDGenLabel7"

@@ -606,8 +606,8 @@ export default class View1 extends Controller {
 
 
     public onQtyChange() {
-        let Yield = Number(this.formModel.getProperty("/YieldQuantity") ),
-            Rework = Number(this.formModel.getProperty("/ReworkQuantity") );
+        let Yield = Number(this.formModel.getProperty("/YieldQuantity")),
+            Rework = Number(this.formModel.getProperty("/ReworkQuantity"));
         let lines = [...this.formModel.getProperty("/_GoodsMovements")];
         for (let index = 0; index < lines.length; index++) {
             const element = lines[index];
@@ -622,9 +622,17 @@ export default class View1 extends Controller {
             }
         }
         this.formModel.setProperty("/_GoodsMovements", lines);
+
+        let lines1 = [...this.formModel.getProperty("/_Activities")];
+        for (let index = 0; index < lines1.length; index++) {
+            const element = lines1[index];
+            lines1[index].Quantity = Number(Number(element.Multiplier) * (Yield + Rework)).toFixed(3)
+        }
+        this.formModel.setProperty("/_Activities", lines1);
+
     }
 
-    public saleableQtyChange(oEvent:any){
+    public saleableQtyChange(oEvent: any) {
         const qty = oEvent.getParameter("value");
         let lines = [...this.formModel.getProperty("/_GoodsMovements")];
         for (let index = 0; index < lines.length; index++) {
@@ -636,7 +644,7 @@ export default class View1 extends Controller {
         this.formModel.setProperty("/_GoodsMovements", lines);
     }
 
-    public RBQtyChange(oEvent:any){
+    public RBQtyChange(oEvent: any) {
         const qty = oEvent.getParameter("value");
         let lines = [...this.formModel.getProperty("/_GoodsMovements")];
         for (let index = 0; index < lines.length; index++) {
@@ -664,28 +672,48 @@ export default class View1 extends Controller {
 
         $.ajax({
             url: "/sap/bc/http/sap/ZHTTP_GENERATEPRODDATA",
-            method: "GET",
-            headers: {
-                "Order": sValue
-            },
+            method: "POST",
+            data: JSON.stringify(this.formModel.getProperty("/")),
             contentType: "application/json",
             success: function (response) {
                 if (response) {
-                    that.formModel.setData({
-                        ...that.formModel.getData(),
-                        ...response,
-                        ManufacturingOrder: sValue
-                    });
+                    that.formModel.setProperty("/", response);
+                    if (response._Activities[0]){
+                        (that.byId("_IDGenInput3") as any).setVisible(true);
+                    } else{
+                        (that.byId("_IDGenInput3") as any).setVisible(false);
+                    }
+                    if (response._Activities[1]){
+                        (that.byId("_IDGenInput7") as any).setVisible(true);
+                    } else{
+                        (that.byId("_IDGenInput7") as any).setVisible(false);
+                    }
+                    if (response._Activities[2]){
+                        (that.byId("_IDGenInput8") as any).setVisible(true);
+                    } else{
+                        (that.byId("_IDGenInput8") as any).setVisible(false);
+                    }
+                    if (response._Activities[3]){
+                        (that.byId("_IDGenInput10") as any).setVisible(true);
+                    } else{
+                        (that.byId("_IDGenInput10") as any).setVisible(false);
+                    }
+                    if (response._Activities[4]) {
+                        (that.byId("_IDGenInput12") as any).setVisible(true);
+                    }else{
+                        (that.byId("_IDGenInput12") as any).setVisible(false);
+                    }
+                    if (response._Activities[5]){
+                        (that.byId("_IDGenInput14") as any).setVisible(true);
+                    } else{
+                        (that.byId("_IDGenInput14") as any).setVisible(false);
+
+                    }
 
                     var oNow = new Date();
-
-                    // Format date as "yyyy-MM-ddTHH:mm:ss" (for DatePicker)
                     var oDateFormatter = DateFormat.getDateInstance({ pattern: "yyyy-MM-ddTHH:mm:ss" });
                     var sFormattedDate = oDateFormatter.format(oNow);
-                    that.formModel.setProperty("/PostingDate",sFormattedDate)
-            
-
-                    MessageToast.show("Fields auto-filled successfully");
+                    that.formModel.setProperty("/PostingDate", sFormattedDate)
                 } else {
                     MessageToast.show("No data found for the entered order");
                 }
