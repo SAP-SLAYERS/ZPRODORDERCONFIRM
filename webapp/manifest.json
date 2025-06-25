@@ -16,22 +16,36 @@
       "toolsId": "b55087ca-ecae-4cae-9d8b-97764d3dacbe"
     },
     "dataSources": {
-      "ZUI_CAPACITYCATEGORY_VAN": {
-        "uri": "/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Annotations(TechnicalName='ZUI_CAPACITYCATEGORY_VAN',Version='0001')/$value/",
+      "ZUI_PRODORDCNFM_VAN": {
+        "uri": "/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Annotations(TechnicalName='ZUI_PRODORDCNFM_VAN',Version='0001')/$value/",
         "type": "ODataAnnotation",
         "settings": {
-          "localUri": "localService/mainService/ZUI_CAPACITYCATEGORY_VAN.xml"
+          "localUri": "localService/mainService/ZUI_PRODORDCNFM_VAN.xml"
         }
       },
       "mainService": {
-        "uri": "/sap/opu/odata/sap/ZUI_CAPACITYCATEGORY/",
+        "uri": "/sap/opu/odata/sap/ZUI_PRODORDCNFM/",
         "type": "OData",
         "settings": {
           "annotations": [
-            "ZUI_CAPACITYCATEGORY_VAN"
+            "ZUI_PRODORDCNFM_VAN"
           ],
           "localUri": "localService/mainService/metadata.xml",
           "odataVersion": "2.0"
+        }
+      }
+    },
+    "crossNavigation": {
+      "inbounds": {
+        "ZPRODORDERCNFM-Create": {
+          "semanticObject": "ZPRODORDERCNFM",
+          "action": "Create",
+          "title": "{{ZPRODORDERCNFM-Create.flpTitle}}",
+          "subTitle": "{{ZPRODORDERCNFM-Create.flpSubtitle}}",
+          "signature": {
+            "parameters": {},
+            "additionalParameters": "allowed"
+          }
         }
       }
     }

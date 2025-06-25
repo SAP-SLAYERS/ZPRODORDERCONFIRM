@@ -37,7 +37,7 @@ export default class View1 extends Controller {
 
 
     public onInit(): void {
-        const oModel = new ODataModel("/sap/opu/odata/sap/ZUI_CAPACITYCATEGORY");
+        const oModel = new ODataModel("/sap/opu/odata/sap/ZUI_PRODORDCNFM");
         this.getView()?.setModel(oModel);
         this.getView()?.setModel(this.formModel, "formModel");
         // this.getView()?.setModel(this.formModel);
@@ -103,7 +103,7 @@ export default class View1 extends Controller {
                     oTable.addColumn(new UIColumn({ label: new Label({ text: "Order" }), template: new Text({ text: "{ManufacturingOrder}" }) }));
 
                     oTable.bindAggregation("rows", {
-                        path: "/zc_productionorder"
+                        path: "/ProductionOrder"
                     });
                 }
 
@@ -129,7 +129,7 @@ export default class View1 extends Controller {
                     oTable.addColumn(new MColumn({ header: new Label({ text: "Order" }) }));
 
                     oTable.bindItems({
-                        path: "/zc_productionorder",
+                        path: "/ProductionOrder",
                         template: new ColumnListItem({
                             cells: [
                                 new Label({ text: "{Product}" }),
