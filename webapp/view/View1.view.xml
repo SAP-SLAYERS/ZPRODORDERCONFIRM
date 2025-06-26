@@ -156,7 +156,6 @@
                             id="_IDGenInput13"
                             value="{formModel>/ReworkQuantity}"
                             type="Number"
-                            width="200px"
                             change="onQtyChange"
                         />
                         <m:Text
