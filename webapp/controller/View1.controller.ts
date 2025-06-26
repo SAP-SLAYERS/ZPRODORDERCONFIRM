@@ -15,10 +15,15 @@ import BusyIndicator from "sap/ui/core/BusyIndicator";
 import MessageToast from "sap/m/MessageToast";
 import JSONModel from "sap/ui/model/json/JSONModel";
 import DateFormat from "sap/ui/core/format/DateFormat";
+import Dialog from "sap/m/Dialog";
+import Button from "sap/m/Button";
+import { ButtonType, DialogType } from "sap/m/library";
+import MessageBox from "sap/m/MessageBox";
 
 export default class View1 extends Controller {
     private _oBasicSearchField: SearchField | null = null;
     private ProductionOrderVHDialog: ValueHelpDialog | null = null;
+    public qtychangedialog: Dialog;
 
 
     public formModel: JSONModel = new JSONModel({
@@ -605,31 +610,33 @@ export default class View1 extends Controller {
 
 
 
-    public onQtyChange() {
-        let Yield = Number(this.formModel.getProperty("/YieldQuantity")),
-            Rework = Number(this.formModel.getProperty("/ReworkQuantity"));
-        let lines = [...this.formModel.getProperty("/_GoodsMovements")];
-        for (let index = 0; index < lines.length; index++) {
-            const element = lines[index];
-            if (element.GoodsMovementType === '101') {
-                lines[index].Quantity = (Yield + Rework);
-            }
-            else if (element.GoodsMovementType === '261' && element.MaterialType !== 'ZCOP') {
-                lines[index].Quantity = Number(Number(element.Multiplier) * (Yield + Rework)).toFixed(3)
-            }
-            else if (element.GoodsMovementType === '531' && element.MaterialType === 'ZCOP') {
-                lines[index].Quantity = Number(Rework).toFixed(3)
-            }
+    public onQtyChange(oEvent: any) {
+        debugger;
+        let that = this;
+        if (!this.qtychangedialog) {
+            this.qtychangedialog = new Dialog({
+                type: DialogType.Message,
+                title: "Confirm",
+                content: new Text({ text: "Do you want to recalculate the values?" }),
+                beginButton: new Button({
+                    type: ButtonType.Emphasized,
+                    text: "Continue",
+                    press: function () {
+                        that.onGenerate();
+                        that.qtychangedialog.close();
+                    }.bind(this)
+                }),
+                endButton: new Button({
+                    text: "Cancel",
+                    press: function () {
+                        that.formModel.setProperty("/YieldQuantity", 0.00)
+                        that.qtychangedialog.close();
+                    }.bind(this)
+                })
+            });
         }
-        this.formModel.setProperty("/_GoodsMovements", lines);
 
-        let lines1 = [...this.formModel.getProperty("/_Activities")];
-        for (let index = 0; index < lines1.length; index++) {
-            const element = lines1[index];
-            lines1[index].Quantity = Number(Number(element.Multiplier) * (Yield + Rework)).toFixed(3)
-        }
-        this.formModel.setProperty("/_Activities", lines1);
-
+        this.qtychangedialog.open();
     }
 
     public saleableQtyChange(oEvent: any) {
@@ -678,40 +685,40 @@ export default class View1 extends Controller {
             success: function (response) {
                 if (response) {
                     that.formModel.setProperty("/", response);
-                    if (response._Activities[0]){
+                    if (response._Activities[0]) {
                         (that.byId("_IDGenInput3") as any).setVisible(true);
-                    } else{
+                    } else {
                         (that.byId("_IDGenInput3") as any).setVisible(false);
                     }
-                    if (response._Activities[1]){
+                    if (response._Activities[1]) {
                         (that.byId("_IDGenInput7") as any).setVisible(true);
-                    } else{
+                    } else {
                         (that.byId("_IDGenInput7") as any).setVisible(false);
                     }
-                    if (response._Activities[2]){
+                    if (response._Activities[2]) {
                         (that.byId("_IDGenInput8") as any).setVisible(true);
-                    } else{
+                    } else {
                         (that.byId("_IDGenInput8") as any).setVisible(false);
                     }
-                    if (response._Activities[3]){
+                    if (response._Activities[3]) {
                         (that.byId("_IDGenInput10") as any).setVisible(true);
-                    } else{
+                    } else {
                         (that.byId("_IDGenInput10") as any).setVisible(false);
                     }
                     if (response._Activities[4]) {
                         (that.byId("_IDGenInput12") as any).setVisible(true);
-                    }else{
+                    } else {
                         (that.byId("_IDGenInput12") as any).setVisible(false);
                     }
-                    if (response._Activities[5]){
+                    if (response._Activities[5]) {
                         (that.byId("_IDGenInput14") as any).setVisible(true);
-                    } else{
+                    } else {
                         (that.byId("_IDGenInput14") as any).setVisible(false);
 
                     }
 
                     var oNow = new Date();
-                    var oDateFormatter = DateFormat.getDateInstance({ pattern: "yyyy-MM-ddTHH:mm:ss" });
+                    var oDateFormatter = DateFormat.getDateInstance({ pattern: "yyyyMMdd" });
                     var sFormattedDate = oDateFormatter.format(oNow);
                     that.formModel.setProperty("/PostingDate", sFormattedDate)
                 } else {
@@ -729,6 +736,11 @@ export default class View1 extends Controller {
     public onClickPost() {
 
         const data = this.formModel.getData();
+
+        if (!data.ShiftDefinition) {
+            MessageBox.error("Shift is required");
+            return;
+        }
 
         $.ajax({
             url: "/sap/bc/http/sap/ZHTTP_PRODORDERCONFIRM",

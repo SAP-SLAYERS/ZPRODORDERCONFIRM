@@ -2,6 +2,7 @@
     xmlns:mvc="sap.ui.core.mvc"
     xmlns:m="sap.m"
     xmlns:core="sap.ui.core"
+    xmlns:l="sap.ui.layout"
     xmlns:t="sap.ui.table"
     xmlns:f="sap.ui.layout.form"
     controllerName="zproductionorder.controller.View1"
@@ -49,6 +50,7 @@
 
                         <m:Label
                             id="_IDGenLabel2"
+                            required="true"
                             text="Order"
                         />
                         <m:Input
@@ -57,6 +59,7 @@
                             value="{formModel>/ManufacturingOrder}"
                             showValueHelp="true"
                             valueHelpRequest=".onProductionOrder"
+                            required="true"
                             change="onChange"
                         />
 
@@ -87,12 +90,14 @@
                         <m:Label
                             id="_IDGenLabel36"
                             text="Shift"
+                            required="true"
                             class="leftPadding"
                         />
                         <m:ComboBox
                             id="_IDGenComboBox2"
                             width="200px"
-                            selectedKey="{formModel>/Shift}"
+                            required="true"
+                            selectedKey="{formModel>/ShiftDefinition}"
                         >
                             <m:items>
                                 <core:Item
@@ -117,18 +122,31 @@
                             width="200px"
                             value="{formModel>/PostingDate}"
                             displayFormat="dd.MM.yyyy"
-                            valueFormat="yyyy-MM-ddTHH:mm:ss"
+                            valueFormat="yyyyMMdd"
                         />
                         <m:Label
                             id="_IDGenLabel12"
                             text="Yield"
+                            required="true"
                         />
                         <m:Input
                             id="_IDGenInput11"
                             value="{formModel>/YieldQuantity}"
                             type="Number"
+                            required="true"
                             change="onQtyChange"
                         />
+                        <m:Text
+                            id="_IDGenLabel13"
+                            text="{formModel>/YieldUnit}"
+                        >
+                            <m:layoutData>
+                                <l:GridData
+                                    id="_IDGenGridData"
+                                    span="XL1 L2 M2 S4"
+                                />
+                            </m:layoutData>
+                        </m:Text>
 
                         <m:Label
                             id="_IDGenLabel14"
@@ -138,8 +156,20 @@
                             id="_IDGenInput13"
                             value="{formModel>/ReworkQuantity}"
                             type="Number"
+                            width="200px"
                             change="onQtyChange"
                         />
+                        <m:Text
+                            id="_IDGenText13"
+                            text="{formModel>/ReworkUnit}"
+                        >
+                            <m:layoutData>
+                                <l:GridData
+                                    id="_IDGenGridData1"
+                                    span="XL1 L2 M2 S4"
+                                />
+                            </m:layoutData>
+                        </m:Text>
 
                         <m:Label
                             id="_IDGenLabel6"
@@ -149,6 +179,7 @@
                             id="_IDGenInput5"
                             value="{formModel>/SaleableWaste}"
                             type="Number"
+                            width="200px"
                             change="saleableQtyChange"
                         />
 
@@ -160,6 +191,7 @@
                             id="_IDGenInput6"
                             value="{formModel>/RBConsumed}"
                             type="Number"
+                            width="200px"
                             change="RBQtyChange"
                         />
 
@@ -382,11 +414,9 @@
                                 />
                             </t:label>
                             <t:template>
-                                <m:Input
+                                <m:Text
                                     id="_IDGenInput9"
-                                    value="{formModel>Batch}"
-                                    showValueHelp="true"
-                                    valueHelpRequest=".onBatch"
+                                    text="{formModel>Batch}"
                                 />
                             </t:template>
                         </t:Column>
@@ -414,10 +444,9 @@
                                 />
                             </t:label>
                             <t:template>
-                                <m:Input
+                                <m:Text
                                     id="_IDGenInput29"
-                                    value="{formModel>Quantity}"
-                                    editable="false"
+                                    text="{formModel>Quantity}"
                                 />
                             </t:template>
                         </t:Column>
