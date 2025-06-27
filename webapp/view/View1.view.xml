@@ -11,11 +11,12 @@
     <m:Page
         id="_IDGenPage1"
         title="Enter Time Ticket for Production Order"
+        showHeader="false"
     >
         <m:customHeader>
             <m:Toolbar id="_IDGenToolbar">
                 <m:ToolbarSpacer id="_IDGenToolbarSpacer" />
-            </m:Toolbar>
+            </m:Toolbar>    
         </m:customHeader>
 
         <m:Panel

@@ -682,6 +682,11 @@ export default class View1 extends Controller {
             data: JSON.stringify(this.formModel.getProperty("/")),
             contentType: "application/json",
             success: function (response) {
+                if(response.includes("Manufacturing Order")){
+                    MessageBox.error(response);
+                    BusyIndicator.hide();
+                    return;
+                }
                 if (response) {
                     that.formModel.setProperty("/", response);
                     if (response._Activities[0]) {
@@ -747,16 +752,11 @@ export default class View1 extends Controller {
             data: JSON.stringify(data),
             contentType: "application/json",
             success: function (response) {
-                if (response) {
-
-                    MessageToast.show("Fields auto-filled successfully");
-                } else {
-                    MessageToast.show("No data found for the entered order");
-                }
+                MessageToast.show(response);
                 BusyIndicator.hide();
             },
             error: function (error) {
-                MessageToast.show("Update failed: " + (error.responseText || "Unknown error"));
+                MessageToast.show((error.responseText || "Unknown error"));
                 BusyIndicator.hide();
             }
         });
