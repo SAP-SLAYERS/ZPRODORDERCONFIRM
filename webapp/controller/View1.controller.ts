@@ -611,7 +611,6 @@ export default class View1 extends Controller {
 
 
     public onQtyChange(oEvent: any) {
-        debugger;
         let that = this;
         if (!this.qtychangedialog) {
             this.qtychangedialog = new Dialog({
@@ -749,7 +748,6 @@ export default class View1 extends Controller {
             contentType: "application/json",
             success: function (response) {
                 if (response) {
-                    debugger
 
                     MessageToast.show("Fields auto-filled successfully");
                 } else {
