@@ -1,0 +1,34 @@
+{
+  "formatVersion": "1",
+  "header": {
+    "description": "Confirm Production Order Operation",
+    "originalLanguage": "en",
+    "abapLanguageVersion": "cloudDevelopment"
+  },
+  "generalInformation": {
+    "appType": "ui5",
+    "catalogId": "SAP_TC_UI5_REPO_UIAD"
+  },
+  "ui5AppDetails": {
+    "appId": "zproductionorder"
+  },
+  "navigation": {
+    "targetMappingId": "UI5R_6680313C409BA10F0DDD30CBB83FD8FC79E08B8C_TM",
+    "semanticObject": "ZPRODORDERCNFM",
+    "action": "Create",
+    "desktop": true,
+    "tablet": true,
+    "phone": true
+  },
+  "tiles": [
+    {
+      "id": "UI5R_6680313C409BA10F0DDD30CBB83FD8FC79E08B8C_AL",
+      "tileType": "static",
+      "isDefault": true,
+      "standard": {
+        "title": "Confirm Production Order Operation",
+        "subtitle": "ZPOC"
+      }
+    }
+  ]
+}
