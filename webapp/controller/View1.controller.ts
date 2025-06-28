@@ -612,6 +612,7 @@ export default class View1 extends Controller {
 
     public onQtyChange(oEvent: any) {
         let that = this;
+        if (!this.formModel.getProperty("/ManufacturingOrder")) return;
         if (!this.qtychangedialog) {
             this.qtychangedialog = new Dialog({
                 type: DialogType.Message,
@@ -675,14 +676,20 @@ export default class View1 extends Controller {
         }
 
         BusyIndicator.show();
-
+        const data = {
+            ...this.formModel.getProperty("/"),
+            YieldQuantity: parseFloat(this.formModel.getProperty("/YieldQuantity")),
+            ReworkQuantity: parseFloat(this.formModel.getProperty("/ReworkQuantity")),
+            SaleableWaste: parseFloat(this.formModel.getProperty("/SaleableWaste")),
+            RBConsumed: parseFloat(this.formModel.getProperty("/RBConsumed")),
+        }
         $.ajax({
             url: "/sap/bc/http/sap/ZHTTP_GENERATEPRODDATA",
             method: "POST",
-            data: JSON.stringify(this.formModel.getProperty("/")),
+            data: JSON.stringify(data),
             contentType: "application/json",
             success: function (response) {
-                if(response.includes("Manufacturing Order")){
+                if (typeof response !== 'object') {
                     MessageBox.error(response);
                     BusyIndicator.hide();
                     return;
@@ -726,12 +733,12 @@ export default class View1 extends Controller {
                     var sFormattedDate = oDateFormatter.format(oNow);
                     that.formModel.setProperty("/PostingDate", sFormattedDate)
                 } else {
-                    MessageToast.show("No data found for the entered order");
+                    MessageBox.show("No data found for the entered order");
                 }
                 BusyIndicator.hide();
             },
             error: function (error) {
-                MessageToast.show("Update failed: " + (error.responseText || "Unknown error"));
+                MessageBox.error("Update failed: " + (error.responseText || "Unknown error"));
                 BusyIndicator.hide();
             }
         });
@@ -740,9 +747,22 @@ export default class View1 extends Controller {
     public onClickPost() {
 
         const data = this.formModel.getData();
+        let that = this;
 
         if (!data.ShiftDefinition) {
             MessageBox.error("Shift is required");
+            return;
+        }
+        if (!data.YieldQuantity) {
+            MessageBox.error("Yeild is required");
+            return;
+        }
+        if (!data.ManufacturingOrder) {
+            MessageBox.error("Order is required");
+            return;
+        }
+        if (!data._GoodsMovements || data._GoodsMovements.length < 0) {
+            MessageBox.error("Goods Movement is necessary");
             return;
         }
 
@@ -752,11 +772,12 @@ export default class View1 extends Controller {
             data: JSON.stringify(data),
             contentType: "application/json",
             success: function (response) {
-                MessageToast.show(response);
+                MessageBox.success(response);
+                that.formModel.setProperty("/", {});
                 BusyIndicator.hide();
             },
             error: function (error) {
-                MessageToast.show((error.responseText || "Unknown error"));
+                MessageBox.error((error.responseText || "Unknown error"));
                 BusyIndicator.hide();
             }
         });
