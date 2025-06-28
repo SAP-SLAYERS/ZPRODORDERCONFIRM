@@ -4,66 +4,66 @@ class ZCL_HTTP_GENERATEPRODDATA definition
 
 PUBLIC SECTION.
 
- TYPES:BEGIN OF tt_mfg_request,
-            ManufacturingOrder TYPE aufnr,
-            Shift              TYPE c LENGTH 2,
-            YieldQuantity      TYPE menge_d,
-            ReworkQuantity     TYPE menge_d,
-            SaleableQuantity   TYPE menge_d,
-            RBCQuantity        TYPE menge_d,
-          END OF tt_mfg_request.
+  TYPES:BEGIN OF tt_mfg_request,
+          ManufacturingOrder TYPE aufnr,
+          YieldQuantity      TYPE menge_d,
+          ReworkQuantity     TYPE menge_d,
+          SaleableWaste      TYPE menge_d,
+          ShiftDefinition    TYPE c LENGTH 2,
+          RBConsumed         TYPE menge_d,
+        END OF tt_mfg_request.
 
-   TYPES: BEGIN OF tt_mfg_order_activites,
-             Quantity TYPE P LENGTH 9 DECIMALS 3,
-             Unit     TYPE erfme,
-             Multiplier TYPE P LENGTH 10 DECIMALS 8,
-             Name     TYPE c LENGTH 40,
-             Item     TYPE i,
-           END OF tt_mfg_order_activites.
+  TYPES: BEGIN OF tt_mfg_order_activites,
+           Quantity   TYPE p LENGTH 9 DECIMALS 3,
+           Unit       TYPE erfme,
+           Multiplier TYPE p LENGTH 10 DECIMALS 8,
+           Name       TYPE c LENGTH 40,
+           Item       TYPE i,
+         END OF tt_mfg_order_activites.
 
-       TYPES: BEGIN OF tt_mfg_order_movements,
-             Material          TYPE matnr,
-             Description       TYPE maktx,
-             Multiplier        TYPE p LENGTH 10 DECIMALS 8,
-             Item              TYPE i,
-             MaterialType      TYPE mtart,
-             Quantity          TYPE menge_d,
-             Plant             TYPE werks_d,
-             StorageLocation   TYPE c LENGTH 4,
-             Batch             TYPE charg_d,
-             GoodsMovementType TYPE bwart,
-             Unit              TYPE erfme,
-           END OF tt_mfg_order_movements.
+  TYPES: BEGIN OF tt_mfg_order_movements,
+           Material          TYPE matnr,
+           Description       TYPE maktx,
+           Multiplier        TYPE p LENGTH 10 DECIMALS 8,
+           Item              TYPE i,
+           MaterialType      TYPE mtart,
+           Quantity          TYPE menge_d,
+           Plant             TYPE werks_d,
+           StorageLocation   TYPE c LENGTH 4,
+           Batch             TYPE charg_d,
+           GoodsMovementType TYPE bwart,
+           Unit              TYPE erfme,
+         END OF tt_mfg_order_movements.
 
-    TYPES: BEGIN OF tt_response,
-             Product               TYPE matnr,
-             ProductDescription    TYPE maktx,
-             Plant                 TYPE werks_d,
-             ManufacturingOrder    TYPE aufnr,
-             Operation             TYPE c LENGTH 4,
-             OperationDescription  TYPE ltxa1,
-             Sequence              TYPE plnfolge,
-             WorkCenter            TYPE arbpl,
-             WorkCenterDescription TYPE c LENGTH 40,
-             Confirmation          TYPE co_rueck,
-             YieldQuantity         TYPE menge_d,
-             YieldUnit             TYPE erfme,
-             ReworkQuantity        TYPE menge_d,
-             ReworkUnit            TYPE erfme,
-             SaleableWaste         TYPE menge_d,
-             ShiftDefinition       TYPE c LENGTH 2,
-             RBConsumed            TYPE menge_d,
-             GoodsMovements        TYPE TABLE OF tt_mfg_order_movements WITH EMPTY KEY,
-             Activities            TYPE TABLE OF tt_mfg_order_activites WITH EMPTY KEY,
-           END OF tt_response.
+  TYPES: BEGIN OF tt_response,
+           Product               TYPE matnr,
+           ProductDescription    TYPE maktx,
+           Plant                 TYPE werks_d,
+           ManufacturingOrder    TYPE aufnr,
+           Operation             TYPE c LENGTH 4,
+           OperationDescription  TYPE ltxa1,
+           Sequence              TYPE plnfolge,
+           WorkCenter            TYPE arbpl,
+           WorkCenterDescription TYPE c LENGTH 40,
+           Confirmation          TYPE co_rueck,
+           YieldQuantity         TYPE menge_d,
+           YieldUnit             TYPE erfme,
+           ReworkQuantity        TYPE menge_d,
+           ReworkUnit            TYPE erfme,
+           SaleableWaste         TYPE menge_d,
+           ShiftDefinition       TYPE c LENGTH 2,
+           RBConsumed            TYPE menge_d,
+           GoodsMovements        TYPE TABLE OF tt_mfg_order_movements WITH EMPTY KEY,
+           Activities            TYPE TABLE OF tt_mfg_order_activites WITH EMPTY KEY,
+         END OF tt_response.
 
-    CLASS-DATA response_type TYPE tt_response.
+  CLASS-DATA response_type TYPE tt_response.
 
-      CLASS-METHODS validate
+  CLASS-METHODS validate
     IMPORTING
       VALUE(filled_details) TYPE tt_mfg_request
     RETURNING
-      VALUE(message) TYPE string.
+      VALUE(message)        TYPE string.
 
 
   INTERFACES if_http_service_extension .
@@ -74,12 +74,12 @@ PUBLIC SECTION.
       VALUE(message) TYPE string .
 
   CLASS-METHODS sendActivity
-     IMPORTING
-        VALUE(name) TYPE string
-        VALUE(quantity) TYPE P
-        VALUE(over_qty) TYPE P
-        VALUE(activity) TYPE LSTAR
-        VALUE(unit) TYPE erfme.
+    IMPORTING
+      VALUE(name)     TYPE string
+      VALUE(quantity) TYPE p
+      VALUE(over_qty) TYPE p
+      VALUE(activity) TYPE lstar
+      VALUE(unit)     TYPE erfme.
 protected section.
 private section.
 ENDCLASS.
@@ -141,6 +141,9 @@ CLASS ZCL_HTTP_GENERATEPRODDATA IMPLEMENTATION.
     response_type-workcenter = mfg_order_basic-WorkCenter.
     response_type-workcenterdescription = mfg_order_basic-WorkCenterText.
     response_type-confirmation = |{ mfg_order_basic-OperationConfirmation ALPHA = OUT }|.
+    response_type-saleablewaste = request_data-SaleableWaste.
+    response_type-rbconsumed = request_data-RBConsumed.
+    response_type-shiftdefinition = request_data-ShiftDefinition.
 
 
 *   Get Activities and Yield Quantities
@@ -297,7 +300,7 @@ CLASS ZCL_HTTP_GENERATEPRODDATA IMPLEMENTATION.
              Plant             = mfg_order_component-Plant
              StorageLocation   = mfg_order_component-StorageLocation
              GoodsMovementType = mfg_order_component-GoodsMovementType
-             quantity          = request_data-saleablequantity
+             quantity          = request_data-saleablewaste
              Unit              = unit1 ).
         APPEND mfg_order_movement TO response_type-GoodsMovements.
         CONTINUE.
@@ -310,7 +313,7 @@ CLASS ZCL_HTTP_GENERATEPRODDATA IMPLEMENTATION.
              Plant             = mfg_order_component-Plant
              StorageLocation   = mfg_order_component-StorageLocation
              GoodsMovementType = mfg_order_component-GoodsMovementType
-             quantity          = request_data-rbcquantity
+             quantity          = request_data-rbconsumed
              Unit              = unit1 ).
         APPEND mfg_order_movement TO response_type-GoodsMovements.
         CONTINUE.

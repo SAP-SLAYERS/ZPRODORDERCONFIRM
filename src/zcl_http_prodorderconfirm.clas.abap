@@ -65,7 +65,6 @@ CLASS ZCL_HTTP_PRODORDERCONFIRM IMPLEMENTATION.
      CASE request->get_method(  ).
       WHEN CONV string( if_web_http_client=>post ).
         response->set_text( postOrder( request ) ).
-        response->set_content_type( 'application/json; charset=utf-8' ).
     ENDCASE.
 
   endmethod.
@@ -97,7 +96,7 @@ CLASS ZCL_HTTP_PRODORDERCONFIRM IMPLEMENTATION.
          ENTITY productionorderconfirmation
          EXECUTE getconfproposal
          FROM VALUE #( (
-                ConfirmationGroup = mfgorder
+                ConfirmationGroup = |{ filled_details-confirmation ALPHA = IN }|
                 %param-ConfirmationYieldQuantity = 0
           ) )
          RESULT DATA(lt_confproposal)
@@ -151,17 +150,28 @@ CLASS ZCL_HTTP_PRODORDERCONFIRM IMPLEMENTATION.
           CLEAR lt_target[].
           LOOP AT lt_gdsmvtproposal ASSIGNING FIELD-SYMBOL(<ls_gdsmvtproposal>) WHERE confirmationgroup = <ls_confproposal>-confirmationgroup.
 
-            LOOP AT filled_details-_goodsmovements INTO DATA(filled_details_goodsmovement) WHERE goodsmovementtype = '101'.
+            LOOP AT filled_details-_goodsmovements INTO DATA(filled_details_goodsmovement) WHERE quantity > 0.
               APPEND INITIAL LINE TO lt_target ASSIGNING FIELD-SYMBOL(<ls_target>).
               <ls_target> = CORRESPONDING #( <ls_gdsmvtproposal>-%param ).
               <ls_target>-%cid = 'Item' && sy-tabix.
               <ls_target>-Material = filled_details_goodsmovement-material.
               <ls_target>-StorageLocation = filled_details_goodsmovement-storagelocation.
-              <ls_target>-OrderItem = '1'.
               <ls_target>-EntryUnit = filled_details_goodsmovement-unit.
               <ls_target>-GoodsmovementType = filled_details_goodsmovement-goodsmovementtype.
               <ls_target>-QuantityInEntryUnit = filled_details_goodsmovement-quantity.
               <ls_target>-Batch = filled_details_goodsmovement-batch.
+
+              IF filled_details_goodsmovement-goodsmovementtype = '101' OR
+                 filled_details_goodsmovement-goodsmovementtype = '102'.
+                <ls_target>-OrderItem = '1'.
+              ELSEIF filled_details_goodsmovement-goodsmovementtype = '261' OR
+                     filled_details_goodsmovement-goodsmovementtype = '262' OR
+                     filled_details_goodsmovement-goodsmovementtype = '531' OR
+                     filled_details_goodsmovement-goodsmovementtype = '532'.
+                <ls_target>-GoodsMovementRefDocType = ''.
+                <ls_target>-OrderItem = ''.
+              ENDIF.
+
 
             ENDLOOP.
           ENDLOOP.
@@ -187,12 +197,6 @@ CLASS ZCL_HTTP_PRODORDERCONFIRM IMPLEMENTATION.
           RETURN.
         ENDIF.
 
-        DELETE filled_details-_goodsmovements INDEX 1.
-        DELETE filled_details-_goodsmovements WHERE quantity <= 0.
-
-
-
-
         SELECT FROM I_MfgOrderConfirmation
           FIELDS MfgOrderConfirmation
           WHERE ManufacturingOrder = @mfgorder
@@ -205,68 +209,7 @@ CLASS ZCL_HTTP_PRODORDERCONFIRM IMPLEMENTATION.
           RETURN.
         ENDIF.
 
-        DATA(MIGOcid) = getCID(  ).
-        MODIFY ENTITIES OF i_materialdocumenttp
-        ENTITY materialdocument
-        CREATE FROM VALUE #( (
-            %cid                          =  MIGOcid
-            postingdate                   =  filled_details-postingdate
-            documentdate                  =  filled_details-postingdate
-            GoodsMovementCode             =  '03'
-            MaterialDocumentHeaderText    =  |{ filled_details-manufacturingorder } { filled_details-operation } { mfg_order_confirmation[ 1 ]-MfgOrderConfirmation }|
-            %control = VALUE #(
-                postingdate                         = cl_abap_behv=>flag_changed
-                documentdate                        = cl_abap_behv=>flag_changed
-                GoodsMovementCode                   = cl_abap_behv=>flag_changed
-                MaterialDocumentHeaderText          = cl_abap_behv=>flag_changed
-                )
-            ) )
-            CREATE BY \_materialdocumentitem
-            FROM VALUE #( (
-                    %cid_ref = MIGOcid
-                    %target = VALUE #( FOR po_line IN filled_details-_goodsmovements  INDEX INTO i (
-                        %cid =  |{ MIGOcid }{ i WIDTH = 3 ALIGN = RIGHT PAD = '0' }|
-                         plant                              =  po_line-plant
-                         Material                           =  po_line-material
-                         goodsmovementtype                  =  po_line-goodsmovementtype
-                         storagelocation                    =  po_line-storagelocation
-                         Batch                              =  po_line-batch
-                         Quantityinentryunit                =  po_line-quantity
-                         entryunit                          =  po_line-unit
-                         ManufacturingOrder                 =  |{ filled_details-manufacturingorder ALPHA = IN }|
-*                         InventoryStockType                 =  '1'
-                         %control = VALUE #(
-                                plant                       = cl_abap_behv=>flag_changed
-                                Material                    = cl_abap_behv=>flag_changed
-                                GoodsMovementType           = cl_abap_behv=>flag_changed
-                                StorageLocation             = cl_abap_behv=>flag_changed
-                                Batch                       = cl_abap_behv=>flag_changed
-                                Quantityinentryunit         = cl_abap_behv=>flag_changed
-                                EntryUnit                   = cl_abap_behv=>flag_changed
-                                ManufacturingOrder          = cl_abap_behv=>flag_changed
-                        )
-                    ) )
-                 ) )
-        MAPPED   DATA(ls_create_mappedi2)
-        FAILED   DATA(ls_create_failedi2)
-        REPORTED DATA(ls_create_reportedi2).
-
-        COMMIT ENTITIES BEGIN
-        RESPONSE OF i_materialdocumenttp
-        FAILED DATA(commit_failedi2)
-        REPORTED DATA(commit_reportedi2).
-
-        IF lines( ls_create_mappedi2-materialdocument ) > 0.
-          LOOP AT ls_create_mappedi2-materialdocument ASSIGNING FIELD-SYMBOL(<fs_migo>).
-            CONVERT KEY OF i_materialdocumenttp FROM <fs_migo>-%pid TO <fs_migo>-%key.
-            DATA(migo_no) = <fs_migo>-%key-MaterialDocument.
-          ENDLOOP.
-        ENDIF.
-
-        COMMIT ENTITIES END.
-
-
-
+        message = |Confirmation successful for manufacturing order { mfgorder } and operation { mfgorderoperation } with confirmation number { mfg_order_confirmation[ 1 ]-mfgorderconfirmation }|.
 
       CATCH cx_root INTO DATA(lx_root).
         message = |General Error: { lx_root->get_text( ) }|.
