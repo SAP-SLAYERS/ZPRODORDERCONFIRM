@@ -613,34 +613,27 @@ export default class View1 extends Controller {
     public onQtyChange(oEvent: any) {
         let that = this;
         if (!this.formModel.getProperty("/ManufacturingOrder")) return;
-        if (!this.qtychangedialog) {
-            this.qtychangedialog = new Dialog({
-                type: DialogType.Message,
-                title: "Confirm",
-                content: new Text({ text: "Do you want to recalculate the values?" }),
-                beginButton: new Button({
-                    type: ButtonType.Emphasized,
-                    text: "Continue",
-                    press: function () {
-                        that.onGenerate();
-                        that.qtychangedialog.close();
-                    }.bind(this)
-                }),
-                endButton: new Button({
-                    text: "Cancel",
-                    press: function () {
-                        that.formModel.setProperty("/YieldQuantity", 0.00)
-                        that.qtychangedialog.close();
-                    }.bind(this)
-                })
-            });
-        }
+        that.onGenerate();
+        // if (!this.qtychangedialog) {
+        //     this.qtychangedialog = new Dialog({
+        //         type: DialogType.Message,
+        //         title: "Confirm",
+        //         content: new Text({ text: "Do you want to recalculate the values?" }),
+        //         beginButton: new Button({
+        //             type: ButtonType.Emphasized,
+        //             text: "Continue",
+        //             press: function () {
+        //                 that.qtychangedialog.close();
+        //             }.bind(this)
+        //         }),
+        //     });
+        // }
 
         this.qtychangedialog.open();
     }
 
     public saleableQtyChange(oEvent: any) {
-        const qty = oEvent.getParameter("value");
+        const qty = Number(oEvent.getParameter("value"));
         let lines = [...this.formModel.getProperty("/_GoodsMovements")];
         for (let index = 0; index < lines.length; index++) {
             const element = lines[index];
@@ -652,12 +645,16 @@ export default class View1 extends Controller {
     }
 
     public RBQtyChange(oEvent: any) {
-        const qty = oEvent.getParameter("value");
+        const qty = Number(oEvent.getParameter("value"));
+        const YieldQuantity = Number(this.formModel.getProperty("/YieldQuantity"))
         let lines = [...this.formModel.getProperty("/_GoodsMovements")];
         for (let index = 0; index < lines.length; index++) {
             const element = lines[index];
             if (element.GoodsMovementType === '261' && element.MaterialType === 'ZCOP') {
                 lines[index].Quantity = Number(qty).toFixed(3)
+            }
+            if (element.GoodsMovementType === '101') {
+                lines[index].Quantity = Number(qty + YieldQuantity).toFixed(3)
             }
         }
         this.formModel.setProperty("/_GoodsMovements", lines);
@@ -772,8 +769,12 @@ export default class View1 extends Controller {
             data: JSON.stringify(data),
             contentType: "application/json",
             success: function (response) {
-                MessageBox.success(response);
-                that.formModel.setProperty("/", {});
+                if (response.includes("Error")) {
+                    MessageBox.error(response);
+                } else {
+                    MessageBox.success(response);
+                    that.formModel.setProperty("/", {});
+                }
                 BusyIndicator.hide();
             },
             error: function (error) {
