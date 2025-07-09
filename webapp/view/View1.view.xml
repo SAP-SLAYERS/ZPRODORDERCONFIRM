@@ -173,7 +173,7 @@
 
                         <m:Label
                             id="_IDGenLabel6"
-                            text="Saleable Waste"
+                            text="Wastage"
                         />
                         <m:Input
                             id="_IDGenInput5"
@@ -181,6 +181,16 @@
                             type="Number"
                             width="200px"
                             change="saleableQtyChange"
+                        />
+
+                            <m:Label id="_IDGenLabel16"
+                            text="Good Yield"
+                        />
+                        <m:Input id="_IDGenInput"
+                            value="{formModel>/GoodYield}"
+                            type="Number"
+                            width="200px"
+                            change="onQtyChange"
                         />
 
                         <m:Label

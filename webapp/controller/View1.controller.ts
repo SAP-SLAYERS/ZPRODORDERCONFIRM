@@ -693,6 +693,22 @@ export default class View1 extends Controller {
                 }
                 if (response) {
                     that.formModel.setProperty("/", response);
+
+                    if(response.CompanyCode === "BNPL"){
+                        (that.byId("_IDGenInput6") as any).setVisible(false);
+                        (that.byId("_IDGenLabe7") as any).setVisible(false);
+                    }else{
+                        (that.byId("_IDGenInput6") as any).setVisible(true);
+                        (that.byId("_IDGenLabe7") as any).setVisible(true);
+                    }
+                    if(response.CompanyCode !== "BNPL" && response.CompanyCode !== "CAPL"){
+                        (that.byId("_IDGenLabel16") as any).setVisible(false);
+                        (that.byId("_IDGenInput") as any).setVisible(false);
+                    }else{
+                        (that.byId("_IDGenLabel16") as any).setVisible(true);
+                        (that.byId("_IDGenInput") as any).setVisible(true);
+                    }
+
                     if (response._Activities[0]) {
                         (that.byId("_IDGenInput3") as any).setVisible(true);
                     } else {
