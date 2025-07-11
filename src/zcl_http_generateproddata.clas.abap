@@ -7,6 +7,7 @@ PUBLIC SECTION.
   TYPES:BEGIN OF tt_mfg_request,
           ManufacturingOrder TYPE aufnr,
           YieldQuantity      TYPE menge_d,
+          GoodYield          TYPE menge_d,
           ReworkQuantity     TYPE menge_d,
           SaleableWaste      TYPE menge_d,
           ShiftDefinition    TYPE c LENGTH 2,
@@ -39,6 +40,7 @@ PUBLIC SECTION.
            Product               TYPE matnr,
            ProductDescription    TYPE maktx,
            Plant                 TYPE werks_d,
+           CompanyCode           TYPE bukrs,
            ManufacturingOrder    TYPE aufnr,
            Operation             TYPE c LENGTH 4,
            OperationDescription  TYPE ltxa1,
@@ -49,6 +51,7 @@ PUBLIC SECTION.
            YieldQuantity         TYPE menge_d,
            YieldUnit             TYPE erfme,
            ReworkQuantity        TYPE menge_d,
+           GoodYield             TYPE menge_d,
            ReworkUnit            TYPE erfme,
            SaleableWaste         TYPE menge_d,
            ShiftDefinition       TYPE c LENGTH 2,
@@ -75,11 +78,11 @@ PUBLIC SECTION.
 
   CLASS-METHODS sendActivity
     IMPORTING
-      VALUE(name)     TYPE string
-      VALUE(quantity) TYPE p
-      VALUE(over_qty) TYPE p
-      VALUE(activity) TYPE lstar
-      VALUE(unit)     TYPE erfme.
+      name     TYPE string
+      quantity TYPE p
+      over_qty TYPE p
+      activity TYPE lstar
+      unit     TYPE erfme.
 protected section.
 private section.
 ENDCLASS.
@@ -126,7 +129,7 @@ CLASS ZCL_HTTP_GENERATEPRODDATA IMPLEMENTATION.
         INNER JOIN I_WorkCenterText AS e ON d~WorkCenterInternalID = e~WorkCenterInternalID
                                          AND d~WorkCenterTypeCode   = e~WorkCenterTypeCode
         FIELDS b~ProductDescription,a~Product,a~ManufacturingOrder,a~ProductionPlant,e~WorkCenterText,d~WorkCenter,c~ManufacturingOrderOperation_2,
-               c~ManufacturingOrderSequence,c~MfgOrderOperationText,c~OperationConfirmation,a~BillOfOperationsGroup
+               c~ManufacturingOrderSequence,c~MfgOrderOperationText,c~OperationConfirmation,a~BillOfOperationsGroup,a~CompanyCode
         WHERE a~ManufacturingOrder = @request_data-ManufacturingOrder
         INTO @DATA(mfg_order_basic).
 
@@ -144,6 +147,8 @@ CLASS ZCL_HTTP_GENERATEPRODDATA IMPLEMENTATION.
     response_type-saleablewaste = request_data-SaleableWaste.
     response_type-rbconsumed = request_data-RBConsumed.
     response_type-shiftdefinition = request_data-ShiftDefinition.
+    response_type-companycode = mfg_order_basic-CompanyCode.
+    response_type-goodyield = request_data-goodyield.
 
 
 *   Get Activities and Yield Quantities
@@ -239,6 +244,11 @@ CLASS ZCL_HTTP_GENERATEPRODDATA IMPLEMENTATION.
         WHERE ManufacturingOrder = @mfg_order_basic-ManufacturingOrder
         INTO @DATA(mfg_order_item_status).
 
+    SELECT SINGLE FROM I_UnitOfMeasure
+         FIELDS UnitOfMeasure_E
+         WHERE UnitOfMeasure = @mfg_order_item_status-ProductionUnit
+         INTO @DATA(unit101).
+
     DATA(main_item) = VALUE tt_mfg_order_movements(
              Material          = mfg_order_item_status-Material
              Description       = mfg_order_item_status-ProductDescription
@@ -248,9 +258,9 @@ CLASS ZCL_HTTP_GENERATEPRODDATA IMPLEMENTATION.
              Plant             = mfg_order_basic-ProductionPlant
              StorageLocation   = mfg_order_item_status-StorageLocation
              Batch             = mfg_order_item_status-Batch
-             quantity          = response_type-yieldquantity + response_type-reworkquantity
+             quantity          = response_type-yieldquantity + response_type-rbconsumed + response_type-goodyield
              GoodsMovementType = '101'
-             Unit              = mfg_order_item_status-ProductionUnit
+             Unit              = unit101
      ).
     APPEND main_item TO response_type-GoodsMovements.
 
@@ -300,11 +310,11 @@ CLASS ZCL_HTTP_GENERATEPRODDATA IMPLEMENTATION.
              Plant             = mfg_order_component-Plant
              StorageLocation   = mfg_order_component-StorageLocation
              GoodsMovementType = mfg_order_component-GoodsMovementType
-             quantity          = request_data-saleablewaste
+             quantity          = request_data-rbconsumed
              Unit              = unit1 ).
         APPEND mfg_order_movement TO response_type-GoodsMovements.
         CONTINUE.
-      ELSEIF mfg_order_component-GoodsMovementType = '531' AND mfg_order_component-ProductType = 'ZNVM'.
+      ELSEIF mfg_order_component-GoodsMovementType = '531' AND ( mfg_order_component-ProductType = 'ZNVM' OR mfg_order_component-ProductType = 'ZWST' ).
         mfg_order_movement = VALUE tt_mfg_order_movements(
              Material          = mfg_order_component-Material
              Description       = mfg_order_component-ProductDescription
@@ -313,7 +323,7 @@ CLASS ZCL_HTTP_GENERATEPRODDATA IMPLEMENTATION.
              Plant             = mfg_order_component-Plant
              StorageLocation   = mfg_order_component-StorageLocation
              GoodsMovementType = mfg_order_component-GoodsMovementType
-             quantity          = request_data-rbconsumed
+             quantity          = request_data-saleablewaste
              Unit              = unit1 ).
         APPEND mfg_order_movement TO response_type-GoodsMovements.
         CONTINUE.
@@ -328,11 +338,19 @@ CLASS ZCL_HTTP_GENERATEPRODDATA IMPLEMENTATION.
             AND BillOfMaterialItemNumber = @mfg_order_component-BillOfMaterialItemNumber
             INTO @DATA(bom_item).
 
-      DATA multiplier TYPE p LENGTH 10 DECIMALS 6.
+      SELECT SINGLE FROM  I_ProductionOrderOpComponentTP AS d
+            FIELDS d~ComponentScrapInPercent
+            WHERE  d~ProductionOrder = @mfg_order_basic-ManufacturingOrder
+            AND d~ProductionOrderOperation = @mfg_order_basic-ManufacturingOrderOperation_2
+            AND d~ProductionOrderSequence = @mfg_order_basic-ManufacturingOrderSequence
+            AND d~BillOfMaterialItemNumber = @mfg_order_component-BillOfMaterialItemNumber
+            INTO @DATA(ComponentScrapInPercent).
+
+      DATA multiplier TYPE p LENGTH 10 DECIMALS 8.
       IF bom_item IS INITIAL OR bom_item = 0.
         multiplier = 1.
       ELSE.
-        multiplier = ( bom_item / bill_of_material-BOMHeaderQuantityInBaseUnit ).
+        multiplier =  bom_item / bill_of_material-BOMHeaderQuantityInBaseUnit * ( 1 + ( ComponentScrapInPercent / 100 ) ).
       ENDIF.
 
       DATA itew_quantity TYPE menge_d.
@@ -350,6 +368,20 @@ CLASS ZCL_HTTP_GENERATEPRODDATA IMPLEMENTATION.
              AND a~MatlWrhsStkQtyInMatlBaseUnit > 0
              ORDER BY b~ShelfLifeExpirationDate ASCENDING
              INTO TABLE @DATA(stock_with_batch).
+
+
+      SELECT FROM I_StockQuantityCurrentValue_2( p_displaycurrency = 'INR' ) AS a
+          INNER JOIN I_Batch AS b ON a~Batch = b~Batch AND a~Plant = b~Plant AND b~ShelfLifeExpirationDate IS INITIAL
+          FIELDS a~MatlWrhsStkQtyInMatlBaseUnit, b~Batch
+          WHERE a~Product = @mfg_order_component-Material
+            AND a~Plant = @mfg_order_component-Plant
+            AND a~StorageLocation = @mfg_order_component-StorageLocation
+            AND a~ValuationAreaType = '1'
+            AND a~MatlWrhsStkQtyInMatlBaseUnit > 0
+            ORDER BY b~LastGoodsReceiptDate ASCENDING
+            INTO TABLE @DATA(stock_with_batch1).
+
+      APPEND LINES OF stock_with_batch1 TO stock_with_batch.
 
       IF stock_with_batch IS INITIAL.
         mfg_order_movement = VALUE tt_mfg_order_movements(
@@ -382,7 +414,7 @@ CLASS ZCL_HTTP_GENERATEPRODDATA IMPLEMENTATION.
           MaterialType      = mfg_order_component-ProductType
           Plant             = mfg_order_component-Plant
           StorageLocation   = mfg_order_component-StorageLocation
-          Batch             = |{ stock_item-Batch ALPHA = OUT }|
+          Batch             = stock_item-Batch
           GoodsMovementType = mfg_order_component-GoodsMovementType
           quantity          = COND #(
                                         WHEN itew_quantity >= stock_item-MatlWrhsStkQtyInMatlBaseUnit
@@ -394,6 +426,22 @@ CLASS ZCL_HTTP_GENERATEPRODDATA IMPLEMENTATION.
         APPEND mfg_order_movement TO response_type-GoodsMovements.
         itew_quantity -= stock_item-MatlWrhsStkQtyInMatlBaseUnit.
       ENDLOOP.
+
+      IF itew_quantity > 0.
+        mfg_order_movement = VALUE tt_mfg_order_movements(
+          Material          = mfg_order_component-Material
+          Description       = mfg_order_component-ProductDescription
+          Multiplier        = multiplier
+          Item              = lines( response_type-GoodsMovements ) + 1
+          MaterialType      = mfg_order_component-ProductType
+          Plant             = mfg_order_component-Plant
+          StorageLocation   = mfg_order_component-StorageLocation
+          GoodsMovementType = mfg_order_component-GoodsMovementType
+          quantity          = itew_quantity
+          Unit              = unit1 ).
+
+        APPEND mfg_order_movement TO response_type-GoodsMovements.
+      ENDIF.
     ENDLOOP.
 
     DATA:json TYPE REF TO if_xco_cp_json_data.
@@ -421,7 +469,7 @@ CLASS ZCL_HTTP_GENERATEPRODDATA IMPLEMENTATION.
     REPLACE ALL OCCURRENCES OF '"YIELDQUANTITY"' IN lv_string WITH '"YieldQuantity"'.
     REPLACE ALL OCCURRENCES OF '"YIELDUNIT"' IN lv_string WITH '"YieldUnit"'.
     REPLACE ALL OCCURRENCES OF '"REWORKQUANTITY"' IN lv_string WITH '"ReworkQuantity"'.
-    REPLACE ALL OCCURRENCES OF '"REWORKUNIT"' IN lv_string WITH '"ReworkUnit"'.
+    REPLACE ALL OCCURRENCES OF '"GOODYIELD"' IN lv_string WITH '"GoodYield"'.
 
     REPLACE ALL OCCURRENCES OF '"GOODSMOVEMENTS"' IN lv_string WITH '"_GoodsMovements"'.
     REPLACE ALL OCCURRENCES OF '"MATERIAL"' IN lv_string WITH '"Material"'.
@@ -441,6 +489,9 @@ CLASS ZCL_HTTP_GENERATEPRODDATA IMPLEMENTATION.
     REPLACE ALL OCCURRENCES OF '"SALEABLEWASTE"' IN lv_string WITH '"SaleableWaste"'.
     REPLACE ALL OCCURRENCES OF '"RBCONSUMED"' IN lv_string WITH '"RBConsumed"'.
     REPLACE ALL OCCURRENCES OF '"SHIFTDEFINITION"' IN lv_string WITH '"ShiftDefinition"'.
+    REPLACE ALL OCCURRENCES OF '"COMPANYCODE"' IN lv_string WITH '"CompanyCode"'.
+
+
 
 
 

@@ -49,7 +49,7 @@ PUBLIC SECTION.
 
    CLASS-METHODS validate
     IMPORTING
-      VALUE(filled_details) TYPE tt_response
+      filled_details TYPE tt_response
     RETURNING
       VALUE(message) TYPE string.
 protected section.
@@ -76,10 +76,10 @@ CLASS ZCL_HTTP_PRODORDERCONFIRM IMPLEMENTATION.
     TRY.
         xco_cp_json=>data->from_string( request->get_text( ) )->write_to( REF #( filled_details ) ).
 
-*        message = validate( filled_details ).
-*        IF message IS NOT INITIAL.
-*          RETURN.
-*        ENDIF.
+        message = validate( filled_details ).
+        IF message IS NOT INITIAL.
+          RETURN.
+        ENDIF.
 
         DATA: mfgorder          TYPE aufnr,
               mfgorderoperation TYPE c LENGTH 4.
@@ -109,7 +109,8 @@ CLASS ZCL_HTTP_PRODORDERCONFIRM IMPLEMENTATION.
           <ls_confirmation>-PostingDate = filled_details-postingdate.
           <ls_confirmation>-ConfirmationReworkQuantity = filled_details-reworkquantity.
           <ls_confirmation>-ConfirmationYieldQuantity = filled_details-yieldquantity.
-*          <ls_confirmation>-%data-ShiftDefinition = filled_details-shiftdefinition .
+          <ls_confirmation>-%data-ShiftDefinition = filled_details-shiftdefinition .
+          <ls_confirmation>-%data-ShiftGrouping = '01' .
 
           LOOP AT filled_details-_activities INTO DATA(act).
             IF act-item = 1.
@@ -219,25 +220,22 @@ CLASS ZCL_HTTP_PRODORDERCONFIRM IMPLEMENTATION.
 
   METHOD validate.
 
-    LOOP AT filled_details-_goodsmovements INTO DATA(ls_goodsmovement) WHERE goodsmovementtype NE '101'.
-
-      DATA material TYPE matnr.
-      material = |{ ls_goodsmovement-material ALPHA = IN }|.
+    LOOP AT filled_details-_goodsmovements INTO DATA(ls_goodsmovement) WHERE goodsmovementtype NE '101'  AND quantity GT 0.
 
       SELECT SINGLE FROM I_StockQuantityCurrentValue_2( P_DisplayCurrency = 'INR' ) AS Stock
          FIELDS  SUM( Stock~MatlWrhsStkQtyInMatlBaseUnit ) AS StockQty
          WHERE Stock~ValuationAreaType = '1'
-         AND stock~Product = @material
+         AND stock~Product = @ls_goodsmovement-material
          AND stock~Plant = @ls_goodsmovement-plant
          AND stock~StorageLocation = @ls_goodsmovement-storagelocation
          AND stock~Batch = @ls_goodsmovement-batch
          INTO @DATA(result).
 
       IF result IS INITIAL.
-        message = |Material { material } not found in stock for plant { ls_goodsmovement-plant } and storage location { ls_goodsmovement-storagelocation }|.
+        message = |Material { ls_goodsmovement-material } not found in stock for plant { ls_goodsmovement-plant } and storage location { ls_goodsmovement-storagelocation }|.
         RETURN.
       ELSEIF result < ls_goodsmovement-quantity.
-        message = |Insufficient stock for material { material } in plant { ls_goodsmovement-plant } and storage location { ls_goodsmovement-storagelocation }|.
+        message = |Insufficient stock for material { ls_goodsmovement-material } in plant { ls_goodsmovement-plant } and storage location { ls_goodsmovement-storagelocation }|.
         RETURN.
       ENDIF.
     ENDLOOP.

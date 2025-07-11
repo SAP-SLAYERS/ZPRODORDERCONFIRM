@@ -26,6 +26,7 @@
       <APP_ID>ZPRODORDERCNFM_IAM_EXT</APP_ID>
       <SRVC_NAME>01E3F0B8BEB73D8363A270F7E4DE2C</SRVC_NAME>
       <SRVC_TYPE>HT</SRVC_TYPE>
+      <TEXT>Production Order Data Generation HTTP Service</TEXT>
       <TYPE_TEXT>HTTP Service</TYPE_TEXT>
      </item>
      <item>
@@ -34,6 +35,7 @@
       <APP_ID>ZPRODORDERCNFM_IAM_EXT</APP_ID>
       <SRVC_NAME>AAFEDFE312EDDEE99FCFA47906818B</SRVC_NAME>
       <SRVC_TYPE>HT</SRVC_TYPE>
+      <TEXT>HTTP Service to Confirm Production Order</TEXT>
       <TYPE_TEXT>HTTP Service</TYPE_TEXT>
      </item>
      <item>
