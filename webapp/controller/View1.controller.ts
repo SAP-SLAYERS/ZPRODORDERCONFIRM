@@ -632,12 +632,32 @@ export default class View1 extends Controller {
         this.qtychangedialog.open();
     }
 
+    public onGoodYieldChange(oEvent:any){
+        const qty = Number(oEvent.getParameter("value"));
+        const YieldQuantity = this.formModel.getProperty("/YieldQuantity");
+
+        if (qty > YieldQuantity * 1.1 || qty === 0) {
+            MessageBox.error("The Good Yield field should be editable within a range of 1 piece to 110% of the total Good Yield");
+            oEvent.getSource().setValue("");
+            return;
+        }
+
+        let lines = [...this.formModel.getProperty("/_GoodsMovements")];
+        for (let index = 0; index < lines.length; index++) {
+            const element = lines[index];
+            if (element.GoodsMovementType === '101') {
+                lines[index].Quantity = (Number(qty) + Number(YieldQuantity)).toFixed(3)
+            }
+        }
+        this.formModel.setProperty("/_GoodsMovements", lines);
+    }
+
     public saleableQtyChange(oEvent: any) {
         const qty = Number(oEvent.getParameter("value"));
         let lines = [...this.formModel.getProperty("/_GoodsMovements")];
         for (let index = 0; index < lines.length; index++) {
             const element = lines[index];
-            if (element.GoodsMovementType === '531' && element.MaterialType === 'ZNVM') {
+            if (element.GoodsMovementType === '531' && (element.MaterialType === 'ZNVM' || element.MaterialType === 'ZWST')) {
                 lines[index].Quantity = Number(qty).toFixed(3)
             }
         }

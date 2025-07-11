@@ -190,7 +190,7 @@
                             value="{formModel>/GoodYield}"
                             type="Number"
                             width="200px"
-                            change="onQtyChange"
+                            change="onGoodYieldChange"
                         />
 
                         <m:Label
