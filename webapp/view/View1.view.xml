@@ -183,10 +183,12 @@
                             change="saleableQtyChange"
                         />
 
-                            <m:Label id="_IDGenLabel16"
+                        <m:Label
+                            id="_IDGenLabel16"
                             text="Good Yield"
                         />
-                        <m:Input id="_IDGenInput"
+                        <m:Input
+                            id="_IDGenInput"
                             value="{formModel>/GoodYield}"
                             type="Number"
                             width="200px"
@@ -316,6 +318,17 @@
                                 id="_IDGenText10"
                                 text="{formModel>/_Activities/5/Unit}"
                                 class="sapUiSmallMarginBegin sapUiSmallMarginEnd"
+                            />
+                        </m:HBox>
+
+                        <m:Label
+                            id="_IDGenLabel15"
+                            text="Batch"
+                        />
+                        <m:HBox id="_IDGenHBox6">
+                            <m:Input
+                                id="_IDGenInput16"
+                                value="{formModel>/_GoodsMovements/0/Batch}"
                             />
                         </m:HBox>
                     </f:content>

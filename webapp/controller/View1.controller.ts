@@ -646,7 +646,7 @@ export default class View1 extends Controller {
         for (let index = 0; index < lines.length; index++) {
             const element = lines[index];
             if (element.GoodsMovementType === '101') {
-                lines[index].Quantity = (Number(qty) + Number(YieldQuantity)).toFixed(3)
+                lines[index].Quantity = Number(qty).toFixed(3)
             }
         }
         this.formModel.setProperty("/_GoodsMovements", lines);
@@ -699,6 +699,7 @@ export default class View1 extends Controller {
             ReworkQuantity: parseFloat(this.formModel.getProperty("/ReworkQuantity")),
             SaleableWaste: parseFloat(this.formModel.getProperty("/SaleableWaste")),
             RBConsumed: parseFloat(this.formModel.getProperty("/RBConsumed")),
+            Batch101:this.formModel.getProperty("/_GoodsMovements/0/Batch")
         }
         $.ajax({
             url: "/sap/bc/http/sap/ZHTTP_GENERATEPRODDATA",
