@@ -655,6 +655,18 @@ export default class View1 extends Controller {
     public saleableQtyChange(oEvent: any) {
         const qty = Number(oEvent.getParameter("value"));
         let lines = [...this.formModel.getProperty("/_GoodsMovements")];
+        const threshold = this.formModel.getProperty("/WastageThreshold");
+        if (Number(qty) > Number(threshold)) {
+            MessageBox.error("Wastage cannot exceed "+ threshold);
+            oEvent.getSource().setValue("0");
+            for (let index = 0; index < lines.length; index++) {
+                const element = lines[index];
+                if (element.GoodsMovementType === '531' && (element.MaterialType === 'ZNVM' || element.MaterialType === 'ZWST')) {
+                    lines[index].Quantity = Number(0).toFixed(3)
+                }
+            }
+            return;
+        }
         for (let index = 0; index < lines.length; index++) {
             const element = lines[index];
             if (element.GoodsMovementType === '531' && (element.MaterialType === 'ZNVM' || element.MaterialType === 'ZWST')) {
@@ -662,6 +674,24 @@ export default class View1 extends Controller {
             }
         }
         this.formModel.setProperty("/_GoodsMovements", lines);
+
+    }
+
+    public postingdateChange(oEvent:any){
+        const PostingDate = oEvent.getParameter("value");
+        const CreationDate = this.formModel.getProperty("/CreatedDate");
+        let year = PostingDate.substring(0,4),
+        month = PostingDate.substring(4,6),
+        date = PostingDate.substring(6,8);
+
+        let postdate  = new Date(year+"-"+month+"-"+date),
+        createdate = new Date(CreationDate);
+        if(postdate<createdate){
+            MessageBox.error("Posting Date cannot be less than Created Date");
+            oEvent.getSource().setValue("");
+            return;
+        }
+
     }
 
     public RBQtyChange(oEvent: any) {
@@ -716,6 +746,7 @@ export default class View1 extends Controller {
                     that.formModel.setProperty("/", response);
 
                     if(response.CompanyCode === "BNPL"){
+                        (that.byId("_IDGenInput13") as any).setEditable(false);
                         (that.byId("_IDGenInput6") as any).setVisible(false);
                         (that.byId("_IDGenLabe7") as any).setVisible(false);
                     }else{
@@ -779,8 +810,10 @@ export default class View1 extends Controller {
     }
 
     public onClickPost() {
-
         const data = this.formModel.getData();
+        const sPostingDate = data.PostingDate
+        const sCreationDate = data.CreationDate;
+        // const oWastageInput = this.byId("_IDGenInput5");
         let that = this;
 
         if (!data.ShiftDefinition) {
@@ -799,7 +832,16 @@ export default class View1 extends Controller {
             MessageBox.error("Goods Movement is necessary");
             return;
         }
+        if (sCreationDate && sPostingDate && sPostingDate < sCreationDate) {
+            MessageBox.error("Posting Date cannot be earlier than Production Order Creation Date.");
+            return;
+        }
 
+        // if (data.SaleableWaste > data.WastageThreshold) {
+        //     MessageBox.error("Wastage cannot exceed "+ data.WastageThreshold);
+        //     return;
+        // }
+ 
         $.ajax({
             url: "/sap/bc/http/sap/ZHTTP_PRODORDERCONFIRM",
             method: "POST",

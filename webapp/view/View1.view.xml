@@ -115,14 +115,28 @@
                         </m:ComboBox>
 
                         <m:Label
+                            id="_IDGenLabel17"
+                            text="Created Date"
+                        />
+                        <m:DatePicker
+                            id="_IDGenDatePicker"
+                            width="200px"
+                            value="{formModel>/CreatedDate}"
+                            editable="false"
+                            displayFormat="dd.MM.yyyy"
+                            valueFormat="yyyyMMdd"
+                        />
+
+                        <m:Label
                             id="_IDGenLabe9"
-                            text="PostingDate"
+                            text="Posting Date"
                         />
                         <m:DatePicker
                             id="_IDGenDatePicker10"
                             width="200px"
                             value="{formModel>/PostingDate}"
                             displayFormat="dd.MM.yyyy"
+                            change="postingdateChange"
                             valueFormat="yyyyMMdd"
                         />
                         <m:Label
