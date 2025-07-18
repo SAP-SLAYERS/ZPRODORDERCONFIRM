@@ -656,7 +656,7 @@ export default class View1 extends Controller {
         const qty = Number(oEvent.getParameter("value"));
         let lines = [...this.formModel.getProperty("/_GoodsMovements")];
         const threshold = this.formModel.getProperty("/WastageThreshold");
-        if (Number(qty) > Number(threshold)) {
+        if (Number(qty) > Number(threshold) && this.formModel.getProperty("/Plant") === "BN02") {
             MessageBox.error("Wastage cannot exceed "+ threshold);
             oEvent.getSource().setValue("0");
             for (let index = 0; index < lines.length; index++) {
