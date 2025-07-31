@@ -22,7 +22,7 @@ builder:
         app:
           name: ZPRODORDERCNFM
           package: ZPRODORDERCONFIRM
-          transport: NXSK903268
+          transport: NXSK903324
         exclude:
           - /test/
   resources:
