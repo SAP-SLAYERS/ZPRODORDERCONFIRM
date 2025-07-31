@@ -745,7 +745,7 @@ export default class View1 extends Controller {
                 if (response) {
                     that.formModel.setProperty("/", response);
 
-                    if(response.CompanyCode === "BNPL"){
+                    if(response.CompanyCode === "BNPL" || response.CompanyCode === "BIPL" || response.CompanyCode === "CAPL"){
                         (that.byId("_IDGenInput13") as any).setEditable(false);
                         (that.byId("_IDGenInput6") as any).setVisible(false);
                         (that.byId("_IDGenLabe7") as any).setVisible(false);
@@ -753,7 +753,7 @@ export default class View1 extends Controller {
                         (that.byId("_IDGenInput6") as any).setVisible(true);
                         (that.byId("_IDGenLabe7") as any).setVisible(true);
                     }
-                    if(response.CompanyCode !== "BNPL" && response.CompanyCode !== "CAPL"){
+                    if(response.CompanyCode !== "BNPL" && response.CompanyCode !== "CAPL" && response.CompanyCode !== "BIPL"){
                         (that.byId("_IDGenLabel16") as any).setVisible(false);
                         (that.byId("_IDGenInput") as any).setVisible(false);
                     }else{
