@@ -661,15 +661,16 @@ export default class View1 extends Controller {
             oEvent.getSource().setValue("0");
             for (let index = 0; index < lines.length; index++) {
                 const element = lines[index];
-                if (element.GoodsMovementType === '531' && (element.MaterialType === 'ZNVM' || element.MaterialType === 'ZWST')) {
+                if (element.GoodsMovementType === '531' && (element.MaterialType === 'ZNVM' || element.MaterialType === 'ZWST') && element.Changeable !== 1) {
                     lines[index].Quantity = Number(0).toFixed(3)
+        
                 }
             }
             return;
         }
         for (let index = 0; index < lines.length; index++) {
             const element = lines[index];
-            if (element.GoodsMovementType === '531' && (element.MaterialType === 'ZNVM' || element.MaterialType === 'ZWST')) {
+            if (element.GoodsMovementType === '531' && (element.MaterialType === 'ZNVM' || element.MaterialType === 'ZWST') && element.Changeable !== 1) {
                 lines[index].Quantity = Number(qty).toFixed(3)
             }
         }

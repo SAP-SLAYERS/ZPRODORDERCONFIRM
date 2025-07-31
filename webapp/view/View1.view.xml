@@ -65,6 +65,32 @@
                         />
 
                         <m:Label
+                            id="_IDGenLabel39"
+                            text="Material"
+                        />
+                        <m:Input
+                            id="_IDGenInput291"
+                            width="200px"
+                            type="Number"
+                            value="{formModel>/Product}"
+                            editable="false"
+                            liveChange="onLiveChange"
+                        />
+
+                        <m:Label
+                            id="_IDGenLabel763"
+                            text="Material Description"
+                        />
+                        <m:Input
+                            id="_IDGenInput265"
+                            width="200px"
+                            type="Text"
+                            value="{formModel>/ProductDescription}"
+                            editable="false"
+                            liveChange="onLiveChange"
+                        />
+
+                        <m:Label
                             id="_IDGenLabel3"
                             text="Operation"
                         />
@@ -196,6 +222,17 @@
                             width="200px"
                             change="saleableQtyChange"
                         />
+                         <m:Text
+                            id="_IDGenLabel131"
+                            text="KG"
+                        >
+                            <!-- <m:layoutData>
+                                <l:GridData
+                                    id="_IDGenGridData111"
+                                    span="XL1 L2 M2 S4"
+                                />
+                            </m:layoutData> -->
+                        </m:Text>
 
                         <m:Label
                             id="_IDGenLabel16"
