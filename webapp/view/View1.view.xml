@@ -71,7 +71,6 @@
                         <m:Input
                             id="_IDGenInput291"
                             width="200px"
-                            type="Number"
                             value="{formModel>/Product}"
                             editable="false"
                             liveChange="onLiveChange"

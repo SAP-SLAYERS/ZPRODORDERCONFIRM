@@ -629,7 +629,7 @@ export default class View1 extends Controller {
         //     });
         // }
 
-        this.qtychangedialog.open();
+        // this.qtychangedialog.open();
     }
 
     public onGoodYieldChange(oEvent:any){
