@@ -159,10 +159,25 @@
                         <m:DatePicker
                             id="_IDGenDatePicker10"
                             width="200px"
-                            value="{formModel>/PostingDate}"
+                            value="{path: 'formModel>/PostingDate'}"
                             displayFormat="dd.MM.yyyy"
                             change="postingdateChange"
                             valueFormat="yyyyMMdd"
+                        />
+
+                        <m:Label
+                            id="_IDGenLabe18"
+                            text="Date of Manufacture"
+                            visible="false"
+                        />
+                        <m:DatePicker
+                            id="_IDGenDatePicker18"
+                            width="200px"
+                            value="{path: 'formModel>/ManufacturingDate'}"
+                            displayFormat="dd.MM.yyyy"
+                            change="ManufacturingdateChange"
+                            valueFormat="yyyyMMdd"
+                            visible="false"
                         />
                         <m:Label
                             id="_IDGenLabel12"
@@ -221,7 +236,7 @@
                             width="200px"
                             change="saleableQtyChange"
                         />
-                         <m:Text
+                        <m:Text
                             id="_IDGenLabel131"
                             text="KG"
                         >

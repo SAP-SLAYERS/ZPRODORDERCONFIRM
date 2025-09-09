@@ -36,7 +36,7 @@ export default class View1 extends Controller {
         Sequence: "",
         WorkCenter: "",
         WorkCenterDescription: "",
-        Confirmation: "",
+        Confirmation: ""
 
     });
 
@@ -632,7 +632,7 @@ export default class View1 extends Controller {
         // this.qtychangedialog.open();
     }
 
-    public onGoodYieldChange(oEvent:any){
+    public onGoodYieldChange(oEvent: any) {
         const qty = Number(oEvent.getParameter("value"));
         const YieldQuantity = this.formModel.getProperty("/YieldQuantity");
 
@@ -657,13 +657,13 @@ export default class View1 extends Controller {
         let lines = [...this.formModel.getProperty("/_GoodsMovements")];
         const threshold = this.formModel.getProperty("/WastageThreshold");
         if (Number(qty) > Number(threshold) && this.formModel.getProperty("/Plant") === "BN02") {
-            MessageBox.error("Wastage cannot exceed "+ threshold);
+            MessageBox.error("Wastage cannot exceed " + threshold);
             oEvent.getSource().setValue("0");
             for (let index = 0; index < lines.length; index++) {
                 const element = lines[index];
                 if (element.GoodsMovementType === '531' && (element.MaterialType === 'ZNVM' || element.MaterialType === 'ZWST') && element.Changeable !== 1) {
                     lines[index].Quantity = Number(0).toFixed(3)
-        
+
                 }
             }
             return;
@@ -678,16 +678,19 @@ export default class View1 extends Controller {
 
     }
 
-    public postingdateChange(oEvent:any){
+    public postingdateChange(oEvent: any) {
         const PostingDate = oEvent.getParameter("value");
         const CreationDate = this.formModel.getProperty("/CreatedDate");
-        let year = PostingDate.substring(0,4),
-        month = PostingDate.substring(4,6),
-        date = PostingDate.substring(6,8);
 
-        let postdate  = new Date(year+"-"+month+"-"+date),
-        createdate = new Date(CreationDate);
-        if(postdate<createdate){
+
+
+        let year = PostingDate.substring(0, 4),
+            month = PostingDate.substring(4, 6),
+            date = PostingDate.substring(6, 8);
+
+        let postdate = new Date(year + "-" + month + "-" + date),
+            createdate = new Date(CreationDate);
+        if (postdate < createdate) {
             MessageBox.error("Posting Date cannot be less than Created Date");
             oEvent.getSource().setValue("");
             return;
@@ -730,7 +733,7 @@ export default class View1 extends Controller {
             ReworkQuantity: parseFloat(this.formModel.getProperty("/ReworkQuantity")),
             SaleableWaste: parseFloat(this.formModel.getProperty("/SaleableWaste")),
             RBConsumed: parseFloat(this.formModel.getProperty("/RBConsumed")),
-            Batch101:this.formModel.getProperty("/_GoodsMovements/0/Batch")
+            Batch101: this.formModel.getProperty("/_GoodsMovements/0/Batch")
         }
         $.ajax({
             url: "/sap/bc/http/sap/ZHTTP_GENERATEPRODDATA",
@@ -746,18 +749,37 @@ export default class View1 extends Controller {
                 if (response) {
                     that.formModel.setProperty("/", response);
 
-                    if(response.CompanyCode === "BNPL" || response.CompanyCode === "BIPL" || response.CompanyCode === "CAPL"){
+                    if (response.CompanyCode === "BBPL" || response.CompanyCode === "HOVL") {
+                        (that.byId("_IDGenLabe18") as any).setVisible(true);
+                        (that.byId("_IDGenLabel14") as any).setText("Rework/RB Generation");
+                        (that.byId("_IDGenDatePicker18") as any).setVisible(true);
+                        (that.byId("_IDGenLabel6") as any).setText("Wastage/SB");
+
+                    } else {
+                        (that.byId("_IDGenLabel14") as any).setText("Rework");
+                        (that.byId("_IDGenLabel6") as any).setText("Wastage");
+                        (that.byId("_IDGenDatePicker18") as any).setVisible(false);
+                        (that.byId("_IDGenLabe18") as any).setVisible(false);
+                        that.formModel.setProperty("/PostingDate", new Date());
+                    }
+
+
+
+
+
+
+                    if (response.CompanyCode === "BNPL" || response.CompanyCode === "BIPL" || response.CompanyCode === "CAPL") {
                         (that.byId("_IDGenInput13") as any).setEditable(false);
                         (that.byId("_IDGenInput6") as any).setVisible(false);
                         (that.byId("_IDGenLabe7") as any).setVisible(false);
-                    }else{
+                    } else {
                         (that.byId("_IDGenInput6") as any).setVisible(true);
                         (that.byId("_IDGenLabe7") as any).setVisible(true);
                     }
-                    if(response.CompanyCode !== "BNPL" && response.CompanyCode !== "CAPL" && response.CompanyCode !== "BIPL"){
+                    if (response.CompanyCode !== "BNPL" && response.CompanyCode !== "CAPL" && response.CompanyCode !== "BIPL") {
                         (that.byId("_IDGenLabel16") as any).setVisible(false);
                         (that.byId("_IDGenInput") as any).setVisible(false);
-                    }else{
+                    } else {
                         (that.byId("_IDGenLabel16") as any).setVisible(true);
                         (that.byId("_IDGenInput") as any).setVisible(true);
                     }
@@ -794,6 +816,10 @@ export default class View1 extends Controller {
 
                     }
 
+
+
+
+
                     var oNow = new Date();
                     var oDateFormatter = DateFormat.getDateInstance({ pattern: "yyyyMMdd" });
                     var sFormattedDate = oDateFormatter.format(oNow);
@@ -808,6 +834,7 @@ export default class View1 extends Controller {
                 BusyIndicator.hide();
             }
         });
+
     }
 
     public onClickPost() {
@@ -842,7 +869,7 @@ export default class View1 extends Controller {
         //     MessageBox.error("Wastage cannot exceed "+ data.WastageThreshold);
         //     return;
         // }
- 
+
         $.ajax({
             url: "/sap/bc/http/sap/ZHTTP_PRODORDERCONFIRM",
             method: "POST",
